@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-
+import requests
 
 @app.route('kvs/admin/view', methods = ['GET', 'PUT', 'DELETE'])
 def handle_views():
@@ -12,4 +12,10 @@ def handle_views():
         data.clear()
         return 200;
     elif request.method == 'PUT': # here comes all the complexity :)
-        
+        body = request.get_json()
+        new_view = body.get('view') # this is the new view!
+        deleted_nodes = [x for x in current_view if x not in new_view] # nodes to delete
+        for node in deleted_nodes:
+            # address, port = node.split(':')
+            url = f"http://{node}/kvs/admin/view"
+            requests.delete(url)
