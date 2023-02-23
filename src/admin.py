@@ -1,5 +1,7 @@
 from flask import Flask, request, jsonify
 import requests
+from globals import current_view, data
+
 
 @app.route('kvs/admin/view', methods = ['GET', 'PUT', 'DELETE'])
 def handle_views():
