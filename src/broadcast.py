@@ -1,4 +1,5 @@
 from globals import current_view, data, data_clocks, address
+import asyncio
 import requests
 
 async def async_request(ip, path, method, key, vector_clock):
@@ -12,7 +13,7 @@ async def async_request(ip, path, method, key, vector_clock):
     else:
       return requests.delete(url, json=state, timeout=(2/len(current_view)))
   except:
-    return "Timeout", 404
+    return -1
 
 # Input:
 #   method: the method on the end point in string form
@@ -20,7 +21,9 @@ async def async_request(ip, path, method, key, vector_clock):
 #   key: the key in the kvs to modify/get
 #   vector_clock: the vector_clock of the node
 async def broadcast(method, path, key, vector_clock):
-  responses = []
+  tasks = []
   for node in current_view:
-    await responses.append(async_request(node, path, method, key, vector_clock))
+    task = asyncio.create_task(async_request(node, path, method, key, vector_clock))
+    tasks.append(task)
+  responses = await asyncio.gather(*tasks)
   return responses
