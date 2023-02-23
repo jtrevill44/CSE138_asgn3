@@ -4,11 +4,11 @@ import requests
 
 async def async_request(ip, path, method, key, vector_clock):
   url = f"http://{ip}{path}{method}/{key}"
-  state = {"causal-metadata" : vector_clock}
+  state = {"causal-metadata" : vector_clock, "source" : address}
   try:
-    if method == 'put':
+    if method == 'PUT':
       return requests.put(url, json=state, timeout=(2/len(current_view)))
-    elif method == 'get':
+    elif method == 'GET':
       return requests.get(url, json=state, timeout=(2/len(current_view)))
     else:
       return requests.delete(url, json=state, timeout=(2/len(current_view)))
