@@ -6,8 +6,6 @@ from globals import address
 
 app = Flask(__name__)
 
-app.config['current_view'] = []
-app.config['data'] = {}
 
 try:
   address = os.environ['ADDRESS']
