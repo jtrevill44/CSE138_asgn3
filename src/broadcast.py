@@ -1,3 +1,6 @@
+from globals import current_view, data, data_clocks, address
+import requests
+
 async def async_request(ip, path, method, key, vector_clock):
   url = f"http://{ip}{path}{method}/{key}"
   state = {"causal-metadata" : vector_clock}
