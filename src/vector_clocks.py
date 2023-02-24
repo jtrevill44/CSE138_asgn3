@@ -20,12 +20,18 @@ class Vector_Clock:
         self.clock = dict() # init to an empty clock
         self.index = find_index() 
 
-    def add_key(self, key: str, num_of_nodes: int):
-        self.clock[key] = [0] * num_of_nodes
+    def add_key(self, key: str):
+        self.clock[key] = [0] * len(current_view)
         return
 
-    def copy(self, other_clock: dict):
-        self.clock = other_clock
+    # sets entire clock (all keys) to another clock (all keys)
+    def copy(self, other_clock_all: dict):
+        self.clock = other_clock_all
+        return
+    
+    # sets the clock at key to the clock passed in
+    def copy_key(self, key:str, other_clock: list):
+        self.clock[key] = other_clock
         return
 
     def reset (self): # clears the clock!
@@ -40,6 +46,11 @@ class Vector_Clock:
     # primarily used for catching a node up!
     def get_clock(self) -> dict:
         return self.clock
+    
+    # returns the clock for one key
+    def get_key_clock(self, key: str) -> list:
+        return self.clock[key]
+
 
     #                       PLEASE NOTE:
     #   this function does not take in another Vector_Clock object
