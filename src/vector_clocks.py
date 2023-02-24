@@ -36,7 +36,8 @@ class Vector_Clock:
         self.clock[key][self.index] += 1
         return
     
-    # returns the value at
+    # returns the value of the whole clock.
+    # primarily used for catching a node up!
     def get_clock(self) -> dict:
         return self.clock
 
