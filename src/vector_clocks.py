@@ -67,10 +67,12 @@ class Vector_Clock:
     # output: 1 if self is greater than other clock,
     #         0 if concurrent
     #         -1 if self is less than other clock
+    #         2 if equal
 
         GREATER_THAN = 1
         LESS_THAN = -1
         CONCURRENT = 0
+        EQUAL_TO = 2
 
         less_val_found = False
         greater_val_found = False
@@ -89,6 +91,8 @@ class Vector_Clock:
             return GREATER_THAN
         elif less_val_found and not greater_val_found:
             return LESS_THAN
-        else:
+        elif less_val_found and greater_val_found:
             return CONCURRENT
+        else:
+            return EQUAL_TO
 
