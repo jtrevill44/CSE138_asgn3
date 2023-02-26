@@ -31,8 +31,11 @@ def handle_put(key):
   # comparing vector clocks ##
   sending_vc = None
   result = data_clocks.compare(client_vc[key], val)
-  if result is 1 or result is 0: # if the client's vector clock is less than or equal to self's
+  if result is 1 or result is 2: # if the client's vector clock is less than or equal to self's
     sending_vc = data_clocks.get_key_clock(key)
+  elif result is 0:
+    string = "do tie break or something! causal metadata was concurrent"
+    # concurrent!
   else: # if result is -1, ie the client's vector clock is greater than self's
     sending_vc = client_vc
     data_clocks.copy(client_vc) # set self's clock to that of the client
