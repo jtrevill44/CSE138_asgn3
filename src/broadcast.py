@@ -7,11 +7,11 @@ async def async_request(ip, path, method, key, vector_clock):
   state = {"causal-metadata" : vector_clock, "source" : address}
   try:
     if method == 'PUT':
-      return requests.put(url, json=state, timeout=(2/len(current_view)))
+      return requests.put(url, json=state, timeout=(2))
     elif method == 'GET':
-      return requests.get(url, json=state, timeout=(2/len(current_view)))
+      return requests.get(url, json=state, timeout=(2))
     else:
-      return requests.delete(url, json=state, timeout=(2/len(current_view)))
+      return requests.delete(url, json=state, timeout=(2))
   except:
     return -1
 
@@ -20,6 +20,9 @@ async def async_request(ip, path, method, key, vector_clock):
 #   path: the path of the end point without the key (ie /internal/write/)
 #   key: the key in the kvs to modify/get
 #   vector_clock: the vector_clock of the node
+#
+# Output:
+#   responses: a list of responses given from all the requests
 async def broadcast(method, path, key, vector_clock):
   tasks = []
   for node in current_view:
