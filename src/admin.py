@@ -1,25 +1,25 @@
 from flask import Flask, request, jsonify
 import requests
-from globals import current_view, data
+import globals
 
 
 @app.route('kvs/admin/view', methods = ['GET', 'PUT', 'DELETE'])
 def handle_views():
 
     if request.method == 'GET':
-        return jsonify(view=current_view), 200
+        return jsonify(view=globals.current_view), 200
 
 
     elif request.method == 'DELETE':
-        current_view.clear()
-        data.clear()
+        globals.current_view.clear()
+        globals.data.clear()
         return 200;
 
 
     elif request.method == 'PUT': # here comes all the complexity :)
         body = request.get_json()
         new_view = body.get('view') # this is the new view!
-        deleted_nodes = [x for x in current_view if x not in new_view] # nodes to delete
+        deleted_nodes = [x for x in globals.current_view if x not in new_view] # nodes to delete
         for node in deleted_nodes:
             # address, port = node.split(':')
             url = f"http://{node}/kvs/admin/view"
@@ -27,7 +27,7 @@ def handle_views():
         # Nodes that were to be deleted are now deleted!
         for node in new_view: # send the new view and state to all nodes!
             url = f"http://{node}/kvs/admin/update"
-            state = {"view":new_view, "data":data}
+            state = {"view":new_view, "data":globals.data}
             requests.put(url, json=state)
     
     else: # unsupported method!
@@ -40,6 +40,6 @@ def handle_views():
 @app.route('kvs/admin/update', methods = ['PUT'])
 def handle_update(): # function and end point for updating nodes with a view update
     body = request.get_json()
-    current_view = body.get('view')
-    data = body.get('data')
+    globals.current_view = body.get('view')
+    globals.data = body.get('data')
     return 200
