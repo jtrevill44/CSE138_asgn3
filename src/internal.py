@@ -35,4 +35,4 @@ def propogate_writes():
      if comparison == 0 or comparison == 1:
         # we have to do some searching here!
         # talk about this section in the meeting tomorrow
-        return "fuck"
+        return

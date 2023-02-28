@@ -34,12 +34,17 @@ class Vector_Clock:
         self.clock[key] = other_clock
         return
 
-    def reset (self): # clears the clock!
+    def reset (self): # clears the clock! 
         self.clock.clear()
         return
 
     def increment(self, key: str): # index is the index of your number in the VC
         self.clock[key][self.index] += 1
+        return
+
+    def combine(self, key: str, other_clock: list):
+        for index in range(len(self.clock[key])):
+            self.clock[key][index] = max(self.clock[key][index], other_clock[index])
         return
     
     # returns the value of the whole clock.
@@ -74,8 +79,12 @@ class Vector_Clock:
         CONCURRENT = 0
         EQUAL_TO = 2
 
+        
         less_val_found = False
         greater_val_found = False
+
+        if not other_clock: # other_clock is empty
+            return GREATER_THAN
 
         clock_check = self.clock[key]
 
