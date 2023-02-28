@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from admin import admin
+from internal import internal
 import os
 
 import globals
@@ -14,7 +15,7 @@ def find_index() -> int:
 
 app = Flask(__name__)
 app.register_blueprint(admin, url_prefix="/kvs/admin")
-
+app.register_blueprint(internal, url_prefix="/kvs/internal")
 
 try:
   globals.address = os.environ['ADDRESS']

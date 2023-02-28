@@ -5,7 +5,9 @@ from broadcast import broadcast
 from vector_clocks import Vector_Clock
 
 
-@app.route('kvs/internal/broadcast', methods = ['PUT', 'DELETE'])
+internal = Blueprint("internal", __name__)
+
+@internal.route('kvs/internal/broadcast', methods = ['PUT', 'DELETE'])
 def propogate_writes():
 
     body = request.get_json()
