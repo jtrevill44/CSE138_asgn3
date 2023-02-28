@@ -1,14 +1,5 @@
 from globals import *
 
-# function finds a node's index for vector clocks!
-# returns -1 if not in view
-def find_index() -> int:
-    for x in range(len(current_view)):
-        if current_view[x] == address:
-            return x
-    return -1 
-
-
 
 class Vector_Clock:
 
@@ -18,31 +9,30 @@ class Vector_Clock:
 
     def __init__(self) -> None:
         self.clock = dict() # init to an empty clock
-        self.index = find_index() 
 
-    def add_key(self, key: str):
+    def add_key(self, key: str) -> None:
         self.clock[key] = [0] * len(current_view)
         return
 
     # sets entire clock (all keys) to another clock (all keys)
-    def copy(self, other_clock_all: dict):
+    def copy(self, other_clock_all: dict) -> None:
         self.clock = other_clock_all
         return
     
     # sets the clock at key to the clock passed in
-    def copy_key(self, key:str, other_clock: list):
+    def copy_key(self, key:str, other_clock: list) -> None:
         self.clock[key] = other_clock
         return
 
-    def reset (self): # clears the clock! 
+    def reset (self) -> None: # clears the clock! 
         self.clock.clear()
         return
 
-    def increment(self, key: str): # index is the index of your number in the VC
-        self.clock[key][self.index] += 1
+    def increment(self, key: str, index: int ) -> None: # index is the index of your number in the VC
+        self.clock[key][index] += 1
         return
 
-    def combine(self, key: str, other_clock: list):
+    def combine(self, key: str, other_clock: list) -> None:
         for index in range(len(self.clock[key])):
             self.clock[key][index] = max(self.clock[key][index], other_clock[index])
         return
