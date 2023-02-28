@@ -1,9 +1,11 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Blueprint
 import requests
 import globals
 
 
-@app.route('kvs/admin/view', methods = ['GET', 'PUT', 'DELETE'])
+admin = Blueprint("admin", __name__)
+
+@admin.route('kvs/admin/view', methods = ['GET', 'PUT', 'DELETE'])
 def handle_views():
 
     if request.method == 'GET':
@@ -37,7 +39,7 @@ def handle_views():
 
 
 
-@app.route('kvs/admin/update', methods = ['PUT'])
+@admin.route('kvs/admin/update', methods = ['PUT'])
 def handle_update(): # function and end point for updating nodes with a view update
     body = request.get_json()
     globals.current_view = body.get('view')

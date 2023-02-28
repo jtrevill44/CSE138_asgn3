@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from admin import handle_update, handle_views
+from admin import admin
 import os
 
 import globals
@@ -13,7 +13,7 @@ def find_index() -> int:
 
 
 app = Flask(__name__)
-
+app.register_blueprint(admin, url_prefix="/kvs/admin")
 
 
 try:
