@@ -20,19 +20,27 @@ def propogate_writes():
             if comparison == -1:
                 data_clocks.copy_key(key, other_clock) # copy the new key into ours!
             
-            # increment data_clock at the ID of the sender
+            # TODO increment data_clock at the ID of the sender
+            if key not in data.keys():
+                returnVal = 201
+            else:
+                returnVal = 200
             data[key] = val # set the actual value
-            return
+            return returnVal
 
         if request.method == 'DELETE':
             if comparison == -1:
                 data_clocks.copy_key(key, other_clock) # copy the new key into ours!
 
-            # increment data_clock at the ID of the sender
-            del data[key]
-            return
+            # TODO increment data_clock at the ID of the sender
+            if key in data.keys():
+                del data[key]
+                return 200
+            return 404
 
      if comparison == 0 or comparison == 1:
+        # TODO
         # we have to do some searching here!
         # talk about this section in the meeting tomorrow
+    
         return
