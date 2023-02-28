@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify, Blueprint
 import requests
-from globals import current_view, data, data_clocks, address
+import globals
 from broadcast import broadcast
 from vector_clocks import Vector_Clock
 
@@ -12,29 +12,29 @@ def propogate_writes():
      key = body.get('key')
      val = body.get('val')
 
-     comparison = data_clocks.compare(other_clock, key)
+     comparison = globals.data_clocks.compare(other_clock, key)
 
      if comparison == 2 or comparison == -1: 
         # we can actually do the fucking operation!
         if request.method == 'PUT':
             if comparison == -1:
-                data_clocks.copy_key(key, other_clock) # copy the new key into ours!
+                globals.data_clocks.copy_key(key, other_clock) # copy the new key into ours!
             
             # TODO increment data_clock at the ID of the sender
-            if key not in data.keys():
+            if key not in globals.data.keys():
                 returnVal = 201
             else:
                 returnVal = 200
-            data[key] = val # set the actual value
+            globals.data[key] = val # set the actual value
             return returnVal
 
         if request.method == 'DELETE':
             if comparison == -1:
-                data_clocks.copy_key(key, other_clock) # copy the new key into ours!
+                globals.data_clocks.copy_key(key, other_clock) # copy the new key into ours!
 
             # TODO increment data_clock at the ID of the sender
-            if key in data.keys():
-                del data[key]
+            if key in globals.data.keys():
+                del globals.data[key]
                 return 200
             return 404
 
