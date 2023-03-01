@@ -48,7 +48,7 @@ def propogate_writes(key):
                 returnVal = 200
             globals.data[key] = val # set the actual value
             globals.last_write[key] = other_id
-            return returnVal
+            return "", returnVal
 
         if request.method == 'DELETE':
             if comparison == -1:
@@ -58,12 +58,35 @@ def propogate_writes(key):
             if key in globals.local_data.keys():
                 globals.local_data[key] = None
                 globals.last_write[key] = other_id
-                return 200
+                return "", 200
             globals.last_write[key] = other_id # ask Ronan about this!
-            return 404
+            return "", 404
 
     if comparison == 0 or comparison == 1:
-        if comparison == 1:
-            return
-    
-        return
+        if comparison == 1: # we're in the future
+            return jsonify(vector_clock=globals.local_clocks[key],val=val), 200
+        
+        if comparison == 0: # we're concurrent
+            # do tie break:
+            if request.method == 'PUT':
+                if last_write[key] < other_id: # the vaue we have right now wins!
+                    return"", 200
+                else: # we're gonna do the put
+                    if key not in globals.local_data.keys():
+                        returnVal = 201
+                    else:
+                        returnVal = 200
+                    globals.data[key] = val # set the actual value
+                    globals.last_write[key] = other_id
+                    return "", returnVal
+            else: # it is a delete!
+                if last_write[key] < other_id:
+                    return "", 200
+                else:
+                     if key in globals.local_data.keys():
+                        globals.local_data[key] = None
+                        globals.last_write[key] = other_id
+                        return "", 200
+                     else:
+                        globals.last_write[key] = other_id # ask Ronan about this!
+                        return "", 404
