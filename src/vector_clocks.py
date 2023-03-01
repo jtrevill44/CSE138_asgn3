@@ -51,7 +51,7 @@ def get_key_clock(self: dict, key: str) -> list:
     #   because when we recieve a clock from a message, we don't 
     #   wanna have to package it into a object. instead we can just 
     #   use the list that was given to us in the message.
-def compare(self: dict, other_clock: list, key: str) -> int:
+def compare(self: dict, key: str, other_clock: list)  -> int:
     # function compares the vector clocks of two clocks
     # input: list representing the clock of another,
     #        a key for the clock you wish to compare

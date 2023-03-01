@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify, Blueprint
 import requests
 import globals
 from broadcast import broadcast
-from vector_clocks import Vector_Clock
+from vector_clocks import *
 
 
 internal = Blueprint("internal", __name__)
@@ -14,50 +14,56 @@ def in_view():
     return False
   return True
 
-@internal.route('kvs/internal/replicate/<key>', methods = ['PUT', 'DELETE'])
+@internal.route('kvs/internal/replicate/<key>', methods = ['GET', 'PUT', 'DELETE'])
 def propogate_writes(key):
 
     body = request.get_json()
     other_clock = body.get('vector_clock')
     val = body.get('val')
+    other_id = body.get('id')
+    source = body.get('source')
 
-    source_ip = request.remote_addr
-    source_port = "8080" # TODO might have to change this idk
-    source = f"{source_ip}:{source_port}" # we need to check if this address is in current_view
 
     if source not in globals.current_view:
         return 403 # node was not in the view!
     
+    if request.method == 'GET':
+        if key not in globals.local_data.keys() and globals.local_data[key] is not None:
+            return 404
+        return jsonify(val=globals.local_data[key], vector_clock=globals.local_clocks[key]), 200
 
-    comparison = globals.data_clocks.compare(other_clock, key)
+
+    comparison = compare(globals.local_clocks, key, other_clock)
 
     if comparison == 2 or comparison == -1: 
         # we can actually do the fucking operation!
         if request.method == 'PUT':
             if comparison == -1:
-                globals.data_clocks.copy_key(key, other_clock) # copy the new key into ours!
+                copy_key(globals.local_clocks, key, other_clock) # copy the new key into ours!
             
             # TODO increment data_clock at the ID of the sender
-            if key not in globals.data.keys():
+            if key not in globals.local_data.keys():
                 returnVal = 201
             else:
                 returnVal = 200
             globals.data[key] = val # set the actual value
+            globals.last_write[key] = other_id
             return returnVal
 
         if request.method == 'DELETE':
             if comparison == -1:
-                globals.data_clocks.copy_key(key, other_clock) # copy the new key into ours!
+               copy_key(globals.local_clocks, key, other_clock) # copy the new key into ours!
 
             # TODO increment data_clock at the ID of the sender
-            if key in globals.data.keys():
-                del globals.data[key]
+            if key in globals.local_data.keys():
+                globals.local_data[key] = None
+                globals.last_write[key] = other_id
                 return 200
+            globals.last_write[key] = other_id # ask Ronan about this!
             return 404
 
     if comparison == 0 or comparison == 1:
-        # TODO
-        # we have to do some searching here!
-        # talk about this section in the meeting tomorrow
+        if comparison == 1:
+            return # TODO
     
         return

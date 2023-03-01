@@ -1,5 +1,6 @@
-data = dict()
+local_data = dict()
 current_view = list()
-data_clocks = dict()
+local_clocks = dict()
+last_write = dict()
 address = str()
 node_id = int()
