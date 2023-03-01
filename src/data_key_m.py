@@ -6,13 +6,6 @@ from vector_clocks import Vector_Clock
 
 blueprint = Blueprint('blueprint', __name__)
 
-def in_view():
-  body = request.get_json()
-  source = body.get('source')
-  if source not in current_view:
-    return False
-  return True
-
 def quorum_rep():
 
   # compare vector clocks ##
@@ -54,16 +47,4 @@ def handle_put(key):
 
   # return vc and return_code ##
   return jsonify({"causal-metadata" : data_clocks[key]}), return_code
-  
 
-
-
-
-@blueprint.route('/internal/write/<key>', methods = ['PUT', 'DELETE'])
-def handle_rep_put(key):
-  
-  # recieved msg from not in view node
-  if not in_view():
-    return jsonify(error="uninitialized"), 418
-  
-  return 200

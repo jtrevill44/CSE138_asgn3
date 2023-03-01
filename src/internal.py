@@ -7,6 +7,13 @@ from vector_clocks import Vector_Clock
 
 internal = Blueprint("internal", __name__)
 
+def in_view():
+  body = request.get_json()
+  ip = body.get('ip')
+  if ip not in globals.current_view:
+    return False
+  return True
+
 @internal.route('kvs/internal/broadcast', methods = ['PUT', 'DELETE'])
 def propogate_writes():
 
