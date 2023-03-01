@@ -14,8 +14,6 @@ def find_index() -> int:
 
 
 app = Flask(__name__)
-app.register_blueprint(admin, url_prefix="/kvs/admin")
-app.register_blueprint(internal, url_prefix="/kvs/internal")
 
 try:
   globals.address = os.environ['ADDRESS']
@@ -23,7 +21,8 @@ try:
 except:
   print("we didn't get an address!")
 
-
+app.register_blueprint(admin, url_prefix="/kvs/admin")
+app.register_blueprint(internal, url_prefix="/kvs/internal")
 
 
 if __name__ == "__main__":
