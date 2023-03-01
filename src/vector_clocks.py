@@ -1,50 +1,47 @@
 from globals import *
 
 
-class Vector_Clock:
 
-    # hold state for index on the clock!
-    # no need for input to function!
-
-
-    def __init__(self) -> None:
-        self.clock = dict() # init to an empty clock
-
-    def add_key(self, key: str) -> None:
-        self.clock[key] = [0] * len(current_view)
-        return
+def add_key(self: dict, key: str) -> None:
+        self[key] = [0] * len(current_view)
+        return 
 
     # sets entire clock (all keys) to another clock (all keys)
-    def copy(self, other_clock_all: dict) -> None:
-        self.clock = other_clock_all
-        return
+def copy(self: dict, other_clock_all: dict) -> None:
+        self = other_clock_all
+        return self
     
     # sets the clock at key to the clock passed in
-    def copy_key(self, key:str, other_clock: list) -> None:
-        self.clock[key] = other_clock
+def copy_key(self: dict, key: str, other_clock: list) -> None:
+        self[key] = other_clock
         return
 
-    def reset (self) -> None: # clears the clock! 
-        self.clock.clear()
+def reset (self: dict) -> None: # clears the clock! 
+        self.clear()
         return
 
-    def increment(self, key: str, index: int ) -> None: # index is the index of your number in the VC
-        self.clock[key][index] += 1
+def increment(self: dict, key: str, index: int ) -> None: # index is the index of your number in the VC
+        self[key][index] += 1
         return
 
-    def combine(self, key: str, other_clock: list) -> None:
-        for index in range(len(self.clock[key])):
-            self.clock[key][index] = max(self.clock[key][index], other_clock[index])
+def combine(self: dict, key: str, other_clock: list) -> None:
+        if self.get(key) is None:
+              self[key] = other_clock
+              return
+        if not other_clock:
+              return
+        for index in range(len(self[key])):
+            self[key][index] = max(self[key][index], other_clock[index])
         return
     
     # returns the value of the whole clock.
     # primarily used for catching a node up!
-    def get_clock(self) -> dict:
-        return self.clock
+def get_clock(self: dict) -> dict:
+        return self
     
     # returns the clock for one key
-    def get_key_clock(self, key: str) -> list:
-        return self.clock[key]
+def get_key_clock(self: dict, key: str) -> list:
+        return self[key]
 
 
     #                       PLEASE NOTE:
@@ -54,7 +51,7 @@ class Vector_Clock:
     #   because when we recieve a clock from a message, we don't 
     #   wanna have to package it into a object. instead we can just 
     #   use the list that was given to us in the message.
-    def compare(self, other_clock: list, key: str) -> int:
+def compare(self: dict, other_clock: list, key: str) -> int:
     # function compares the vector clocks of two clocks
     # input: list representing the clock of another,
     #        a key for the clock you wish to compare
@@ -76,7 +73,11 @@ class Vector_Clock:
         if not other_clock: # other_clock is empty
             return GREATER_THAN
 
-        clock_check = self.clock[key]
+        clock_check = self[key]
+
+        if len(clock_check) != len(other_clock):
+              return -2739045 # idk man something fucking weird happened
+
 
         for i in range(len(clock_check)):
             if clock_check[i] > other_clock[i]:
