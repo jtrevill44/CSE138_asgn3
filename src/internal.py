@@ -5,7 +5,7 @@ from broadcast import broadcast
 from vector_clocks import *
 
 
-internal = Blueprint("internal", __name__)
+internal = Blueprint("internal", __name__, url_prefix="/kvs/internal")
 
 def in_view():
   body = request.get_json()
@@ -14,7 +14,7 @@ def in_view():
     return False
   return True
 
-@internal.route('kvs/internal/replicate/<key>', methods = ['GET', 'PUT', 'DELETE'])
+@internal.route('/replicate/<key>', methods = ['GET', 'PUT', 'DELETE'])
 def propogate_writes(key):
 
     body = request.get_json()
@@ -25,11 +25,11 @@ def propogate_writes(key):
 
 
     if source not in globals.current_view:
-        return 403 # node was not in the view!
+        return "",403 # node was not in the view!
     
     if request.method == 'GET':
         if key not in globals.local_data.keys() and globals.local_data[key] is not None:
-            return 404
+            return "",404
         return jsonify(val=globals.local_data[key], vector_clock=globals.local_clocks[key]), 200
 
 
@@ -64,6 +64,6 @@ def propogate_writes(key):
 
     if comparison == 0 or comparison == 1:
         if comparison == 1:
-            return # TODO
+            return
     
         return
