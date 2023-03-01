@@ -14,12 +14,11 @@ def in_view():
     return False
   return True
 
-@internal.route('kvs/internal/broadcast', methods = ['PUT', 'DELETE'])
-def propogate_writes():
+@internal.route('kvs/internal/replicate/<key>', methods = ['PUT', 'DELETE'])
+def propogate_writes(key):
 
     body = request.get_json()
     other_clock = body.get('vector_clock')
-    key = body.get('key')
     val = body.get('val')
 
     source_ip = request.remote_addr
