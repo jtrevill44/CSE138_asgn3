@@ -70,10 +70,17 @@ def compare(self: dict, key: str, other_clock: list)  -> int:
         less_val_found = False
         greater_val_found = False
 
-        if not other_clock: # other_clock is empty
-            return GREATER_THAN
+
 
         clock_check = self[key]
+
+        if not clock_check and not other_clock: # both clocks are empty
+            return EQUAL_TO
+        elif not other_clock: # only other_clock is empty
+            return GREATER_THAN
+        elif not clock_check: # our clock is empty
+              return LESS_THAN
+
 
         if len(clock_check) != len(other_clock):
               return -2739045 # idk man something fucking weird happened
