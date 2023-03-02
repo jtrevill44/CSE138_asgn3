@@ -28,7 +28,7 @@ def propogate_writes(key):
         return "",403 # node was not in the view!
     
     if request.method == 'GET':
-        if key not in globals.local_data.keys() and globals.local_data[key] is not None:
+        if key not in globals.local_data.keys():
             return "",404
         return jsonify(val=globals.local_data[key], vector_clock=globals.local_clocks[key]), 200
 
@@ -41,7 +41,6 @@ def propogate_writes(key):
             if comparison == -1:
                 copy_key(globals.local_clocks, key, other_clock) # copy the new key into ours!
             
-            # TODO increment data_clock at the ID of the sender
             if key not in globals.local_data.keys():
                 returnVal = 201
             else:
@@ -54,7 +53,6 @@ def propogate_writes(key):
             if comparison == -1:
                copy_key(globals.local_clocks, key, other_clock) # copy the new key into ours!
 
-            # TODO increment data_clock at the ID of the sender
             if key in globals.local_data.keys():
                 globals.local_data[key] = None
                 globals.last_write[key] = other_id
