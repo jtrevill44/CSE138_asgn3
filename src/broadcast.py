@@ -23,10 +23,10 @@ async def async_request(ip, path, method, key, vector_clock, val=None):
 #
 # Output:
 #   responses: a list of responses given from all the requests
-async def broadcast(method, path, key, vector_clock, val=None):
+async def broadcast(method, path, key, vector_clock, val=None, node_id = globals.node_id):
   tasks = []
   for node in globals.current_view:
-    task = asyncio.create_task(async_request(node, path, method, key, vector_clock, val))
+    task = asyncio.create_task(async_request(node, path, method, key, vector_clock, val, node_id))
     tasks.append(task)
   responses = await asyncio.gather(*tasks)
   return responses
