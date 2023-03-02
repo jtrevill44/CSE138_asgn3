@@ -90,3 +90,11 @@ def propogate_writes(key):
                      else:
                         globals.last_write[key] = other_id # ask Ronan about this!
                         return "", 404
+
+
+@internal.route('/kvs', methods=['GET'])
+def get_all():
+    body = request.get_json()
+    other_id = body.get('id')
+    source = body.get('source')
+    return jsonify(vector_clock= globals.local_clocks, kvs= globals.local_data)
