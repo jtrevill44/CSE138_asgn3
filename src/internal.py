@@ -75,6 +75,7 @@ def propogate_writes(key):
                     else:
                         returnVal = 200
                     globals.data[key] = val # set the actual value
+                    globals.local_clocks[key] = other_clock
                     globals.last_write[key] = other_id
                     return "", returnVal
             else: # it is a delete!
@@ -83,6 +84,7 @@ def propogate_writes(key):
                 else:
                      if key in globals.local_data.keys():
                         globals.local_data[key] = None
+                        globals.local_clocks[key] = other_clock
                         globals.last_write[key] = other_id
                         return "", 200
                      else:
