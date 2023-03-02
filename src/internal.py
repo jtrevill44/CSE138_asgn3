@@ -18,11 +18,12 @@ def in_view():
 def propogate_writes(key):
 
     body = request.get_json()
-    other_clock = body.get('vector_clock')
+    other_clock = dict(body.get('vector_clock'))
     val = body.get('val')
     other_id = body.get('id')
     source = body.get('source')
 
+    learn_new_keys(globals.local_clocks, other_clock)
 
     if source not in globals.current_view:
         return "",403 # node was not in the view!
@@ -33,13 +34,13 @@ def propogate_writes(key):
         return jsonify(val=globals.local_data[key], vector_clock=globals.local_clocks[key]), 200
 
 
-    comparison = compare(globals.local_clocks, key, other_clock)
+    comparison = compare(globals.local_clocks, key, other_clock[key])
 
     if comparison == 2 or comparison == -1: 
         # we can actually do the fucking operation!
         if request.method == 'PUT':
             if comparison == -1:
-                copy_key(globals.local_clocks, key, other_clock) # copy the new key into ours!
+                copy_key(globals.local_clocks, key, other_clock[key]) # copy the new key into ours!
             
             if key not in globals.local_data.keys():
                 returnVal = 201
@@ -51,7 +52,7 @@ def propogate_writes(key):
 
         if request.method == 'DELETE':
             if comparison == -1:
-               copy_key(globals.local_clocks, key, other_clock) # copy the new key into ours!
+               copy_key(globals.local_clocks, key, other_clock[key]) # copy the new key into ours!
 
             if key in globals.local_data.keys():
                 globals.local_data[key] = None
@@ -75,7 +76,7 @@ def propogate_writes(key):
                     else:
                         returnVal = 200
                     globals.data[key] = val # set the actual value
-                    globals.local_clocks[key] = other_clock
+                    globals.local_clocks[key] = other_clock[key]
                     globals.last_write[key] = other_id
                     return "", returnVal
             else: # it is a delete!
@@ -84,7 +85,7 @@ def propogate_writes(key):
                 else:
                      if key in globals.local_data.keys():
                         globals.local_data[key] = None
-                        globals.local_clocks[key] = other_clock
+                        globals.local_clocks[key] = other_clock[key]
                         globals.last_write[key] = other_id
                         return "", 200
                      else:
@@ -97,4 +98,6 @@ def get_all():
     body = request.get_json()
     other_id = body.get('id')
     source = body.get('source')
+    other_clock = dict(body.get('vector_clock'))
+    learn_new_keys(globals.local_clocks, other_clock)
     return jsonify(vector_clock= globals.local_clocks, kvs= globals.local_data)

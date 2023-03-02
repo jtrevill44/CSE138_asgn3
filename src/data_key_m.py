@@ -14,6 +14,7 @@ def handle_put(key):
   body = request.get_json()
   client_vc = dict(body.get('causal-metadata'))
   val = body.get('val')
+  learn_new_keys(globals.local_clocks, client_vc) # find key clocks we don't know of
 
   if len(val) > EIGHT_MEGABYTES:
     return jsonify(error="val too large"), 400
@@ -36,7 +37,7 @@ def handle_put(key):
   increment(globals.local_data, key, globals.node_id)
 
   # broadcast
-  responses = broadcast(request.method, f'/internal/write/<{key}>', key, globals.local_clocks[key]) # change data_clocks[key] to the sending_vc
+  responses = broadcast(request.method, f'/internal/write/<{key}>', key, globals.local_clocks, val=val) # change data_clocks[key] to the sending_vc
 
   return jsonify({"causal-metadata" : globals.local_clocks}), return_code
 
