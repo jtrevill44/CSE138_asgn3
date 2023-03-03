@@ -91,7 +91,8 @@ def get(key):
     #so everything is causally consistent. 
 
     #update clock to represent the successful read, and broadcast the new clock to replicas
-    increment(local_clocks, key, node_id)
+    increment(globals.local_clocks, key, node_id)
+    increment(globals.known_clocks, key, globals.node_id)
     tmp = broadcast('PUT','/internal/replicate', key, local_clocks[key], local_data[key])
     #and return the data
     return jsonify(val=local_data[key], causal_metadata=known_clocks)
