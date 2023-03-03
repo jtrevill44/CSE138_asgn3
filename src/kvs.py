@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-
+from vector_clocks import *
 from globals import *
 from broadcast import broadcast
 from vector_clocks import compare

@@ -83,7 +83,7 @@ def compare(self: dict, key: str, other_clock: list)  -> int:
 
 
         if len(clock_check) != len(other_clock):
-              return -2739045 # idk man something fucking weird happened
+              return None # idk man something fucking weird happened
 
 
         for i in range(len(clock_check)):
@@ -103,3 +103,9 @@ def compare(self: dict, key: str, other_clock: list)  -> int:
         else:
             return EQUAL_TO
 
+def update_known_clocks(causal_metadata):
+    for key, clock in causal_metadata.items():
+        if key not in known_clocks:
+            globals.known_clocks[key] = clock
+        else:
+            combine(globals.known_clocks, key, clock)
