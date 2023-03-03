@@ -72,7 +72,7 @@ def compare(self: dict, key: str, other_clock: list)  -> int:
 
 
 
-        clock_check = self[key]
+        clock_check = self.get(key, [0] * len(globals.current_view))
 
         if not clock_check and not other_clock: # both clocks are empty
             return EQUAL_TO
