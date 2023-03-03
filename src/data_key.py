@@ -13,7 +13,15 @@ def handle_put(key):
 
   # get body and data
   body = request.get_json()
-  causal_metadata = dict(body.get('causal-metadata'))
+
+  temp = body.get('causal-metadata', None)
+  if temp is not None:
+    causal_metadata = dict(body.get('causal-metadata', None))
+    update_known_clocks(causal_metadata)
+    request_clock = causal_metadata.get(key, None)
+  else:
+    causal_metadata = dict()
+    request_clock = list()
   val = body.get('val')
   update_known_clocks(causal_metadata)
 
@@ -49,24 +57,47 @@ def handle_put(key):
 
 @client_side.route("/<key>", methods=["GET"])
 def get(key):
+
     #get the json object from the request
     json = request.get_json()
+
     #get the metadata from the json
-    causal_metadata = dict(json.get('causal-metadata', None))
-    update_known_clocks(causal_metadata)
-    request_clock = causal_metadata.get(key, None)
+    temp = json.get('causal-metadata', None)
+    if temp is not None:
+      causal_metadata = dict(json.get('causal-metadata', None))
+      update_known_clocks(causal_metadata)
+      request_clock = causal_metadata.get(key, None)
+    else:
+       causal_metadata = dict()
+       request_clock = list()
+
+    # if key is not found in local kvs, broadcast get to all other nodes and check if they have key
+    if (globals.local_data.get(key, None) == None):
+       responses = asyncio.run(broadcast('GET', f'http://kvs/internal/replicate/{key}', key, globals.local_clocks))
+       for response in responses:
+          if response is not 404 and compare(globals.local_clocks, key, dict(response.get_json().get('causal-metadata', None))[key]) == -1:
+             globals.local_data[key] = int(response.get_json().get('val'))
+             globals.local_clocks[key] = dict(response.get_json().get('causal-metadata', None))[key]
+    
+    #if key is still not found, return 418 with error
+    if (globals.local_data.get(key) == None):
+       return jsonify({"causal-metadata" : causal_metadata, 'error' : 'uninitialized'}), 418
+             
+
+
     #Request clock not existing means message isn't causally dependant on the value 
     if request_clock == None:
         #check if we've seen the key 
         if globals.known_clocks.get(key) == None:
             #if not return an error
-            return jsonify(causal_metadata=globals.known_clocks), 404
+            return jsonify({"causal-metadata" : globals.known_clocks}), 404
         elif compare(globals.local_clocks, key, globals.known_clocks.get(key)) == 2:
             #if so, update the clocks to signify a read
             increment(globals.local_clocks, key, globals.node_id)
             tmp = broadcast('PUT','/internal/replicate', key, globals.local_clocks[key], globals.local_data[key])
             #and return the data
-            return jsonify(val=globals.local_data[key], causal_metadata=globals.known_clocks)
+            return jsonify({"val" : globals.local_data[key], "causal-metadata" : globals.known_clocks})
+        
     #compare internal clock to response clock
     #keep looping while the metadata is behind
     while(compare(globals.local_clocks, key, causal_metadata.get(key, [0]*len(globals.current_view)))<=0):
@@ -95,4 +126,4 @@ def get(key):
     increment(globals.known_clocks, key, globals.node_id)
     tmp = broadcast('PUT',f'/internal/replicate/{key}', key, globals.local_clocks[key], globals.local_data[key])
     #and return the data
-    return jsonify(val=globals.local_data[key], causal_metadata=globals.known_clocks)
+    return jsonify({"val" : globals.local_data[key], "causal-metadata" : globals.known_clocks})

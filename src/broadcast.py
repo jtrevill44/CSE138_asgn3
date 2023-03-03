@@ -20,7 +20,7 @@ async def async_request(ip, path, method, key = None, vector_clock = dict(), val
 
 # Input:
 #   method: the method on the end point in string form
-#   path: the path of the end point without the key (ie /internal/write/)
+#   path: the path of the end point with the key (ie /internal/write/)
 #   key: the key in the kvs to modify/get
 #   vector_clock: the vector_clock of the node
 #
