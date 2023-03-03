@@ -11,6 +11,7 @@ def kvs():
     #get the data from the request
     request_json = request.get_json()
     causal_metadata = request_json.get('causal_metadata', None)
+    update_known_clocks(causal_metadata)
     #loop til we're up to date with the request's clocks
     while(True):
         #get the info from all the other nodes
@@ -40,4 +41,4 @@ def kvs():
             break
         
     #return keys of all data
-    return jsonify(count=len(local_clocks), keys=local_data.keys()) 
+    return jsonify(count=len(local_clocks), keys=local_data.keys(), causal_metadata=known_clocks) 

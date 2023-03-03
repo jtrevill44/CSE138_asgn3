@@ -12,19 +12,20 @@ def get(key):
     json = request.get_json()
     #get the metadata from the json
     causal_metadata = json.get('causal_metadata', None)
+    update_known_clocks(causal_metadata)
     request_clock = causal_metadata.get(key, None)
     #Request clock not existing means message isn't causally dependant on the value 
     if request_clock == None:
         #check if we've seen the key 
         if local_clocks.get(key) == None:
             #if not return an error
-            return jsonify(causal_metadata=local_clocks), 404
+            return jsonify(causal_metadata=known_clocks), 404
         else:
             #if so, update the clocks to signify a read
             increment(local_clocks, key, node_id)
             tmp = broadcast('PUT','/internal/replicate', key, local_clocks[key], local_data[key])
             #and return the data
-            return jsonify(val=local_data[key], causal_metadata=local_clocks)
+            return jsonify(val=local_data[key], causal_metadata=known_clocks)
     #compare internal clock to response clock
     #keep looping while the metadata is behind
     while(compare(local_clocks, key, causal_metadata.get(key, [0]*len(current_view)))<0):
@@ -52,4 +53,4 @@ def get(key):
     increment(local_clocks, key, node_id)
     tmp = broadcast('PUT','/internal/replicate', key, local_clocks[key], local_data[key])
     #and return the data
-    return jsonify(val=local_data[key], causal_metadata=local_clocks)
+    return jsonify(val=local_data[key], causal_metadata=known_clocks)
