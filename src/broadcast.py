@@ -2,9 +2,9 @@ import globals
 import asyncio
 import requests
 
-async def async_request(ip, path, method, key, vector_clock, val=None):
+async def async_request(ip, path, method, key, vector_clock, val=None, node_id):
   url = f"http://{ip}{path}{method}/{key}"
-  state = {"val": val, "causal-metadata" : vector_clock, "source" : globals.address}
+  state = {"val": val, "vector_clock" : vector_clock, "source" : globals.address, "node_id" : node_id}
   try:
     if method == 'PUT':
       return requests.put(url, json=state, timeout=(2))
@@ -23,7 +23,7 @@ async def async_request(ip, path, method, key, vector_clock, val=None):
 #
 # Output:
 #   responses: a list of responses given from all the requests
-async def broadcast(method, path, key, vector_clock, val=None, node_id = globals.node_id):
+async def broadcast(method, path, key, vector_clock, val=None, node_id = globals.node_id, source = globals.address):
   tasks = []
   for node in globals.current_view:
     task = asyncio.create_task(async_request(node, path, method, key, vector_clock, val, node_id))
