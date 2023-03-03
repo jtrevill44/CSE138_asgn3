@@ -23,7 +23,6 @@ def propogate_writes(key):
     val = body.get('val')
     other_id = body.get('id')
     source = body.get('source')
-    print(globals.current_view)
     if source not in globals.current_view:
         return "",403 # node was not in the view!
     
@@ -67,7 +66,7 @@ def propogate_writes(key):
         if comparison == 0: # we're concurrent
             # do tie break:
             if request.method == 'PUT':
-                if last_write[key] < other_id: # the vaue we have right now wins!
+                if globals.last_write[key] < other_id: # the vaue we have right now wins!
                     return"", 200
                 else: # we're gonna do the put
                     if key not in globals.local_data.keys():
@@ -79,7 +78,7 @@ def propogate_writes(key):
                     globals.last_write[key] = other_id
                     return "", returnVal
             else: # it is a delete!
-                if last_write[key] < other_id:
+                if globals.last_write[key] < other_id:
                     return "", 200
                 else:
                      if key in globals.local_data.keys():

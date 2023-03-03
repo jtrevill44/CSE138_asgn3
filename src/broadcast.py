@@ -1,6 +1,7 @@
 import globals
 import asyncio
 import requests
+from multiprocessing import Pool
 
 async def async_request(ip, path, method, key = None, vector_clock = dict(), val = None, node_id = globals.node_id, source = globals.address):
   url = f"http://{ip}{path}"

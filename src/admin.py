@@ -48,7 +48,7 @@ def handle_views():
                 requests.put(url, json=state, timeout=1)
             except: 
                 continue
-    
+        # globals.syncThread.start()
     else: # unsupported method!
         return "", 405
 
@@ -63,4 +63,5 @@ def handle_update(): # function and end point for updating nodes with a view upd
     globals.local_data = body.get('kvs')
     globals.local_clocks = body.get('vector_clock')
     globals.node_id = find_index()
+    # globals.syncThread.start()
     return "", 200

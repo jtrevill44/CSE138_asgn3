@@ -1,18 +1,19 @@
 import globals
 from flask import Flask, request, jsonify, Blueprint
 import requests
-import schedule
-import time
-
+import threading
+import os
 
 
 def send_request():
-    url = f'http://{globals.address}/kvs/data'
-    response = requests.get(url)
+    # print("hello")
+    while len(globals.current_view) > 0:
+        os.sleep(5)
+        url = f'http://{globals.address}/kvs/data'
+        response = requests.get(url)
 
 def sync():
-    schedule.every(5).seconds.do(send_request)
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+    # print("FUA")
+    globals.syncThread = threading.Thread(target=send_request())
+    
         
