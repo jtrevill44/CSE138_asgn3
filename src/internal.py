@@ -23,7 +23,6 @@ def propogate_writes(key):
     other_id = body.get('id')
     source = body.get('source')
 
-    learn_new_keys(globals.local_clocks, other_clock)
 
     if source not in globals.current_view:
         return "",403 # node was not in the view!
@@ -99,5 +98,4 @@ def get_all():
     other_id = body.get('id')
     source = body.get('source')
     other_clock = dict(body.get('vector_clock'))
-    learn_new_keys(globals.local_clocks, other_clock)
     return jsonify(vector_clock= globals.local_clocks, kvs= globals.local_data)

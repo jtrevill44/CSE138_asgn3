@@ -14,7 +14,7 @@ def handle_put(key):
   body = request.get_json()
   client_vc = dict(body.get('causal-metadata'))
   val = body.get('val')
-  learn_new_keys(globals.local_clocks, client_vc) # find key clocks we don't know of
+
 
   if len(val) > EIGHT_MEGABYTES:
     return jsonify(error="val too large"), 400
