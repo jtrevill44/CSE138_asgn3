@@ -3,6 +3,7 @@ import requests
 import globals
 from broadcast import broadcast
 from vector_clocks import *
+import asyncio
 
 client_side = Blueprint('client_side', __name__, url_prefix= '/kvs/data')
 EIGHT_MEGABYTES = 8388608
@@ -16,7 +17,7 @@ def handle_put(key):
   val = body.get('val')
   update_known_clocks(causal_metadata)
 
-
+  
   if len(val) > EIGHT_MEGABYTES:
     return jsonify(error="val too large"), 400
 
@@ -24,9 +25,11 @@ def handle_put(key):
 
   if key not in globals.local_clocks.keys():
     add_key(globals.local_clocks, key)
+  if key not in globals.known_clocks.keys():
+    add_key(globals.known_clocks, key)
 
   # comparing vector clocks ##
-  result = compare(globals.local_clocks, key, causal_metadata.get(key, []))
+  result = compare(globals.local_clocks, key, causal_metadata.get(key, [0] * len(globals.current_view)))
   if result == 0:
     combine(globals.local_data, key, causal_metadata.get(key, []))
   elif result == -1: # if result is -1, ie the client's vector clock is greater than self's
@@ -38,9 +41,8 @@ def handle_put(key):
 
   increment(globals.local_clocks, key, globals.node_id)
   increment(globals.known_clocks, key, globals.node_id)
-
   # broadcast
-  responses = broadcast(request.method, f'/internal/replicate/<{key}>', key, globals.local_clocks, val=val) # change data_clocks[key] to the sending_vc
+  responses = asyncio.run(broadcast(request.method, f'/kvs/internal/replicate/{key}', key, globals.local_clocks, val=val, source=globals.address, node_id=globals.node_id)) # change data_clocks[key] to the sending_vc
 
   return jsonify({"causal-metadata" : globals.known_clocks}), return_code
 
@@ -93,6 +95,6 @@ def get(key):
     #update clock to represent the successful read, and broadcast the new clock to replicas
     increment(globals.local_clocks, key, globals.node_id)
     increment(globals.known_clocks, key, globals.node_id)
-    tmp = broadcast('PUT','/internal/replicate', key, globals.local_clocks[key], globals.local_data[key])
+    tmp = broadcast('PUT',f'/internal/replicate/{key}', key, globals.local_clocks[key], globals.local_data[key])
     #and return the data
     return jsonify(val=globals.local_data[key], causal_metadata=globals.known_clocks)

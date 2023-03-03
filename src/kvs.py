@@ -4,9 +4,9 @@ from globals import *
 from broadcast import broadcast
 from vector_clocks import compare
 
-app = Blueprint(__name__, "__main__")
+get_all = Blueprint("get_all", __name__)
 
-@app.route('/data/kvs', methods=['GET'])
+@get_all.route('/data/kvs', methods=['GET'])
 def kvs():
     #get the data from the request
     request_json = request.get_json()

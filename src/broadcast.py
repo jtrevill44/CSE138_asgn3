@@ -5,7 +5,8 @@ import requests
 async def async_request(ip, path, method, key = None, vector_clock = dict(), val = None, node_id = globals.node_id, source = globals.address):
   url = f"http://{ip}{path}"
   # path needs to include the /<key> if that endpoint needs one
-  state = {"key": key, "val": val, "vector_clock" : vector_clock, "source" : globals.address, "id" : node_id, "source" : source}
+  state = {"key": key, "val": val, "vector_clock" : vector_clock, "id" : node_id, "source" : source}
+  # print(state)
   try:
     if method == 'PUT':
       return requests.put(url, json=state, timeout=(2))

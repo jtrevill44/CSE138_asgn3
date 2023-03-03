@@ -3,6 +3,7 @@ import requests
 import globals
 from broadcast import broadcast
 from vector_clocks import *
+import pdb
 
 
 internal = Blueprint("internal", __name__, url_prefix="/kvs/internal")
@@ -22,8 +23,7 @@ def propogate_writes(key):
     val = body.get('val')
     other_id = body.get('id')
     source = body.get('source')
-
-
+    print(globals.current_view)
     if source not in globals.current_view:
         return "",403 # node was not in the view!
     
@@ -34,7 +34,7 @@ def propogate_writes(key):
 
 
     comparison = compare(globals.local_clocks, key, other_clock[key])
-
+    
     if comparison == 2 or comparison == -1: 
         # we can actually do the fucking operation!
         if request.method == 'PUT':
@@ -45,7 +45,7 @@ def propogate_writes(key):
                 returnVal = 201
             else:
                 returnVal = 200
-            globals.data[key] = val # set the actual value
+            globals.local_data[key] = val # set the actual value
             globals.last_write[key] = other_id
             return "", returnVal
 
