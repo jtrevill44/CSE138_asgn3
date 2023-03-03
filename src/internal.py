@@ -9,7 +9,7 @@ internal = Blueprint("internal", __name__, url_prefix="/kvs/internal")
 
 def in_view():
   body = request.get_json()
-  ip = body.get('ip')
+  ip = body.get('source')
   if ip not in globals.current_view:
     return False
   return True
