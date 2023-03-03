@@ -1,9 +1,9 @@
-from globals import *
+import globals
 
 
 
 def add_key(self: dict, key: str) -> None:
-        self[key] = [0] * len(current_view)
+        self[key] = [0] * len(globals.current_view)
         return 
 
     # sets entire clock (all keys) to another clock (all keys)
@@ -103,9 +103,9 @@ def compare(self: dict, key: str, other_clock: list)  -> int:
         else:
             return EQUAL_TO
 
-def update_known_clocks(causal_metadata):
+def update_known_clocks(causal_metadata: dict):
     for key, clock in causal_metadata.items():
-        if key not in known_clocks:
+        if key not in globals.known_clocks:
             globals.known_clocks[key] = clock
         else:
             combine(globals.known_clocks, key, clock)
