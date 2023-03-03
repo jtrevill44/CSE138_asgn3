@@ -42,17 +42,14 @@ def get(key):
             if(compare(json, 'vector_clock', newest_clock)>0):
                 newest_clock = json.get('vector_clock')
                 newest_value = json.get('val')
-        #pass
+        #update internal information
         local_clocks[key] = newest_clock
         local_data[key] = newest_value
-        #update internal information
-        #data_clocks.copy_key(updated_clock, key)
     #now we know our internal information is synced at least to where the client was, 
     #so everything is causally consistent. 
 
+    #update clock to represent the successful read, and broadcast the new clock to replicas
     increment(local_clocks, key, node_id)
     tmp = broadcast('PUT','/internal/replicate', key, local_clocks[key], local_data[key])
     #and return the data
     return jsonify(val=local_data[key], causal_metadata=local_clocks)
-    #update clock to represent the successful read, and broadcast the new clock to replicas
-    #broadcast(PUT, "/internal/write", key, data_clocks.get_key_clock(key))
