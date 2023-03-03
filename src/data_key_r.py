@@ -20,7 +20,7 @@ def get(key):
         if known_clocks.get(key) == None:
             #if not return an error
             return jsonify(causal_metadata=known_clocks), 404
-        else:
+        elif compare(local_clocks, key, known_clocks.get(key)) == 2:
             #if so, update the clocks to signify a read
             increment(local_clocks, key, node_id)
             tmp = broadcast('PUT','/internal/replicate', key, local_clocks[key], local_data[key])
