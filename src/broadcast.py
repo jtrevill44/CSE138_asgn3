@@ -2,9 +2,10 @@ import globals
 import asyncio
 import requests
 
-async def async_request(ip, path, method, key, vector_clock, val=None, node_id = globals.node_id):
-  url = f"http://{ip}{path}{method}/{key}"
-  state = {"val": val, "vector_clock" : vector_clock, "source" : globals.address, "id" : node_id}
+async def async_request(ip, path, method, key = None, vector_clock = dict(), val = None, node_id = globals.node_id, source = globals.address):
+  url = f"http://{ip}{path}"
+  # path needs to include the /<key> if that endpoint needs one
+  state = {"key": key, "val": val, "vector_clock" : vector_clock, "source" : globals.address, "id" : node_id, "source" : source}
   try:
     if method == 'PUT':
       return requests.put(url, json=state, timeout=(2))
@@ -26,7 +27,7 @@ async def async_request(ip, path, method, key, vector_clock, val=None, node_id =
 async def broadcast(method, path, key, vector_clock, val=None, node_id = globals.node_id, source = globals.address):
   tasks = []
   for node in globals.current_view:
-    task = asyncio.create_task(async_request(node, path, method, key, vector_clock, val, node_id))
+    task = asyncio.create_task(async_request(ip = node, path = path, method = method, key = key, vector_clock= vector_clock, val = val, node_id= node_id, key = key, source = source))
     tasks.append(task)
   responses = await asyncio.gather(*tasks)
   return responses
