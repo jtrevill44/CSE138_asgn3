@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from admin import admin
 from internal import internal
+from data_key_m import client_side
 import os
 import globals
 
@@ -14,6 +15,7 @@ except:
 
 app.register_blueprint(admin, url_prefix="/kvs/admin")
 app.register_blueprint(internal, url_prefix="/kvs/internal")
+app.register_blueprint(client_side, url_prefix="/kvs/data")
 
 
 if __name__ == "__main__":
