@@ -21,6 +21,9 @@ def handle_put(key):
 
   return_code = 200 if key in globals.local_data else 201
 
+  if key not in globals.local_clocks.keys():
+    add_key(globals.local_clocks, key)
+
   # comparing vector clocks ##
   result = compare(globals.local_clocks, key, client_vc.get(key, []))
   if result is 0:
@@ -31,8 +34,6 @@ def handle_put(key):
     return jsonify({"causal-metadata" : globals.local_clocks}), return_code
 
   # update vc
-  if key not in globals.local_clocks.keys(): # we need a new entry in the clocks
-    add_key(globals.local_clocks, key)
 
   increment(globals.local_data, key, globals.node_id)
 
