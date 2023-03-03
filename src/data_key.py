@@ -94,7 +94,7 @@ def get(key):
         elif compare(globals.local_clocks, key, globals.known_clocks.get(key)) == 2:
             #if so, update the clocks to signify a read
             increment(globals.local_clocks, key, globals.node_id)
-            tmp = broadcast('PUT','/internal/replicate', key, globals.local_clocks[key], globals.local_data[key])
+            tmp = asyncio.run(broadcast('PUT','/internal/replicate', key, globals.local_clocks[key], globals.local_data[key]))
             #and return the data
             return jsonify({"val" : globals.local_data[key], "causal-metadata" : globals.known_clocks})
         
@@ -103,7 +103,7 @@ def get(key):
     while(compare(globals.local_clocks, key, causal_metadata.get(key, [0]*len(globals.current_view)))<=0):
         #if internal behind, check with other replica's for updates. 
         #either a response with the newer vector clock, or hang
-        responses = broadcast("GET", "/internal/read", key, causal_metadata[key])
+        responses = asyncio.run(broadcast("GET", "/internal/read", key, causal_metadata[key]))
         #tmp variable to hold the newst list/val seen
         newest_clock = globals.local_clocks.get(key, [0] * len(globals.current_view))
         newest_value = globals.local_data.get(key)
@@ -124,6 +124,6 @@ def get(key):
     #update clock to represent the successful read, and broadcast the new clock to replicas
     increment(globals.local_clocks, key, globals.node_id)
     increment(globals.known_clocks, key, globals.node_id)
-    tmp = broadcast('PUT',f'/internal/replicate/{key}', key, globals.local_clocks[key], globals.local_data[key])
+    tmp = asyncio.run(broadcast('PUT',f'/internal/replicate/{key}', key, globals.local_clocks[key], globals.local_data[key]))
     #and return the data
     return jsonify({"val" : globals.local_data[key], "causal-metadata" : globals.known_clocks})

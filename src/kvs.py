@@ -3,6 +3,7 @@ from vector_clocks import *
 from globals import *
 from broadcast import broadcast
 from vector_clocks import compare
+import asyncio
 
 get_all = Blueprint("get_all", __name__)
 
@@ -15,7 +16,7 @@ def kvs():
     #loop til we're up to date with the request's clocks
     while(True):
         #get the info from all the other nodes
-        datas = broadcast('GET', '/internal/kvs', '',[], '')
+        datas = asyncio.run(broadcast('GET', '/internal/kvs', '',[], ''))
         #loop through the responses 
         for data in datas:
             #if dead, skip
@@ -41,4 +42,4 @@ def kvs():
             break
         
     #return keys of all data
-    return jsonify(count=len(local_clocks), keys=local_data.keys(), causal_metadata=known_clocks) 
+    return jsonify({"count" : len(local_clocks), "keys" : local_data.keys(), "causal-metadata" : known_clocks}), 200

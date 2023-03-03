@@ -3,10 +3,14 @@ from admin import admin
 from internal import internal
 from data_key import client_side
 from kvs import get_all
-from sync import sync
+from sync import sync_2
 import os
 import globals
+from apscheduler.schedulers.background import BackgroundScheduler
 
+sched = BackgroundScheduler(daemon=True)
+sched.add_job(sync_2,'interval',seconds=4)
+sched.start()
 
 app = Flask(__name__)
 
