@@ -2,7 +2,7 @@ import globals
 import asyncio
 import requests
 
-async def async_request(ip, path, method, key, vector_clock, val=None, node_id):
+async def async_request(ip, path, method, key, vector_clock, val=None, node_id = globals.node_id):
   url = f"http://{ip}{path}{method}/{key}"
   state = {"val": val, "vector_clock" : vector_clock, "source" : globals.address, "id" : node_id}
   try:
