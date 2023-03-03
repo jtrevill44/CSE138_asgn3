@@ -34,8 +34,6 @@ def handle_put(key):
     combine(globals.local_data, key, causal_metadata.get(key, []))
   elif result == -1: # if result is -1, ie the client's vector clock is greater than self's
     copy_key(globals.local_clocks, key, causal_metadata[key]) # set self's clock to that of the client
-  elif result == 1: # we were in the future, don't do anything and send our clock.
-    return jsonify({"causal-metadata" : globals.local_clocks}), return_code
 
   # update vc
 
