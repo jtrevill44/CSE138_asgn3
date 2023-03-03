@@ -17,7 +17,7 @@ def get(key):
     #Request clock not existing means message isn't causally dependant on the value 
     if request_clock == None:
         #check if we've seen the key 
-        if local_clocks.get(key) == None:
+        if known_clocks.get(key) == None:
             #if not return an error
             return jsonify(causal_metadata=known_clocks), 404
         else:
@@ -28,7 +28,7 @@ def get(key):
             return jsonify(val=local_data[key], causal_metadata=known_clocks)
     #compare internal clock to response clock
     #keep looping while the metadata is behind
-    while(compare(local_clocks, key, causal_metadata.get(key, [0]*len(current_view)))<0):
+    while(compare(local_clocks, key, causal_metadata.get(key, [0]*len(current_view)))<=0):
         #if internal behind, check with other replica's for updates. 
         #either a response with the newer vector clock, or hang
         responses = broadcast("GET", "/internal/read", key, causal_metadata[key])
