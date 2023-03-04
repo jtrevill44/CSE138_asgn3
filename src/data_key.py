@@ -75,20 +75,6 @@ def get(key):
     if (globals.node_id == -1):
       return jsonify({"causal-metadata" : causal_metadata, 'error' : 'uninitialized'}), 418
 
-    # if key is not found in local kvs, broadcast get to all other nodes and check if they have key
-    if (globals.local_data.get(key, None) == None and request_clock != None):
-       responses = asyncio.run(broadcast('GET', f'http://kvs/internal/replicate/{key}', key, globals.local_clocks))
-       for response in responses:
-          if response != 404 and compare(globals.local_clocks, key, dict(response.get_json().get('causal-metadata', None))[key]) == -1:
-             globals.local_data[key] = int(response.get_json().get('val'))
-             globals.local_clocks[key] = dict(response.get_json().get('causal-metadata', None))[key]
-    
-    #if key is still not found, return 418 with error
-    if (globals.local_data.get(key) == None):
-       return jsonify({"causal-metadata" : causal_metadata, 'error' : 'uninitialized'}), 418
-             
-
-
     #Request clock not existing means message isn't causally dependant on the value 
     if request_clock == None:
         #check if we've seen the key 
@@ -124,7 +110,6 @@ def get(key):
     #so everything is causally consistent. 
 
 
-    tmp = asyncio.run(broadcast('PUT',f'/internal/replicate/{key}', key, globals.local_clocks[key], globals.local_data[key]))
     #and return the data
     if globals.local_data.get(key, None) is None:
       return {"causal-metadata": globals.known_clocks}, 404
