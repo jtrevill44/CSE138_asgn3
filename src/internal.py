@@ -85,12 +85,16 @@ def propogate_writes(key):
 
 @internal.route('/kvs', methods=['GET'])
 def get_all():
-    if source not in globals.current_view:
-        return "",403 # node was not in the view!
 
     body = request.get_json()
     other_id = body.get('id')
     source = body.get('source')
+    print(source)
+    print(globals.current_view)
+
+    if source not in globals.current_view:
+        return "",403 # node was not in the view!
+
     other_clock = dict(body.get('vector_clock'))
     return jsonify(vector_clock= globals.local_clocks, kvs= globals.local_data, last_write= globals.last_write), 200
 

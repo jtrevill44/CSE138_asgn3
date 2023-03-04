@@ -25,7 +25,7 @@ def kvs():
     #loop til we're up to date with the request's clocks
     while(True):
         #get the info from all the other nodes
-        datas = asyncio.run(broadcast('GET', '/kvs/internal/kvs', '',[], ''))
+        datas = asyncio.run(broadcast('GET', '/kvs/internal/kvs', '',[], source=globals.address))
         #loop through the responses 
         for data in datas:
             #if dead, skip
