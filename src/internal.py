@@ -31,6 +31,7 @@ def propogate_writes(key):
         if request.method == 'PUT':
             if comparison == -1:
                 copy_key(globals.local_clocks, key, other_clock[key]) # copy the new key into ours!
+                combine(globals.known_clocks, key, globals.local_clocks.get(key, [0], len(globals.current_view)))
             
             if key not in globals.local_data.keys():
                 returnVal = 201
@@ -43,6 +44,7 @@ def propogate_writes(key):
         if request.method == 'DELETE':
             if comparison == -1:
                copy_key(globals.local_clocks, key, other_clock[key]) # copy the new key into ours!
+               combine(globals.known_clocks, key, globals.local_clocks.get(key, [0], len(globals.current_view)))
 
             if key in globals.local_data.keys():
                 globals.local_data[key] = None
@@ -53,20 +55,23 @@ def propogate_writes(key):
 
     if comparison == 0 or comparison == 1:
         if comparison == 1: # we're in the future
-            return jsonify(vector_clock=globals.local_clocks[key],val=val), 200
-        
+            return jsonify(vector_clock=globals.local_clocks[key],val=val), 200 # don't replicate a write from the past
+            # really, this shouldn't be able to happen tho
         if comparison == 0: # we're concurrent
             # do tie break:
             if request.method == 'PUT':
                 if globals.last_write[key] < other_id: # the vaue we have right now wins!
+                    combine(globals.local_clocks, key, other_clock.get(key, len(globals.current_view)))
+                    combine(globals.known_clocks, key, globals.local_clocks.get(key, [0], len(globals.current_view)))
                     return"", 200
                 else: # we're gonna do the put
                     if key not in globals.local_data.keys():
                         returnVal = 201
                     else:
                         returnVal = 200
-                    globals.data[key] = val # set the actual value
-                    globals.local_clocks[key] = other_clock[key]
+                    globals.local_data[key] = val # set the actual value
+                    combine(globals.local_clocks, key, other_clock.get(key, len(globals.current_view)))
+                    combine(globals.known_clocks, key, globals.local_clocks.get(key, [0], len(globals.current_view)))
                     globals.last_write[key] = other_id
                     return "", returnVal
             else: # it is a delete!
@@ -75,7 +80,8 @@ def propogate_writes(key):
                 else:
                      if key in globals.local_data.keys():
                         globals.local_data[key] = None
-                        globals.local_clocks[key] = other_clock[key]
+                        combine(globals.local_clocks, key, other_clock.get(key, len(globals.current_view)))
+                        combine(globals.known_clocks, key, globals.local_clocks.get(key, [0], len(globals.current_view)))
                         globals.last_write[key] = other_id
                         return "", 200
                      else:
