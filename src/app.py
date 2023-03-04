@@ -7,12 +7,10 @@ from sync import sync_2
 import os
 import globals
 from apscheduler.schedulers.background import BackgroundScheduler
-
-sched = BackgroundScheduler(daemon=True)
-sched.add_job(sync_2,'interval',seconds=4)
-sched.start()
+from flask_apscheduler import APScheduler
 
 app = Flask(__name__)
+scheduler = APScheduler()
 
 try:
   globals.address = os.environ['ADDRESS']
@@ -27,7 +25,8 @@ app.register_blueprint(get_all)
 
 
 if __name__ == "__main__":
-    # sync()
+    scheduler.add_job(id = 'Scheduled Task', func=sync_2, trigger="interval", seconds=3)
+    scheduler.start()
     app.run(host='0.0.0.0', port=8080)
 
 
