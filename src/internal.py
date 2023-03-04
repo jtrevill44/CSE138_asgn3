@@ -29,7 +29,7 @@ def propogate_writes(key):
     if request.method == 'GET':
         if key not in globals.local_data.keys():
             return "",404
-        return jsonify(val=globals.local_data[key], vector_clock=globals.local_clocks[key]), 200
+        return jsonify(val=globals.local_data[key], vector_clock=globals.local_clocks[key], last_write=globals.last_write), 200
 
 
     comparison = compare(globals.local_clocks, key, other_clock[key])
