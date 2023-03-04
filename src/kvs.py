@@ -13,7 +13,7 @@ def kvs():
      return jsonify(error='URL is too large'), 414
 
     if (globals.node_id == -1):
-      return jsonify({"causal-metadata" : causal_metadata, 'error' : 'uninitialized'}), 418
+      return jsonify({"causal-metadata" : globals.known_clocks, 'error' : 'uninitialized'}), 418
 
     #get the data from the request
     request_json = request.get_json()
