@@ -25,6 +25,9 @@ def handle_views():
     elif request.method == 'DELETE':
         globals.current_view.clear()
         globals.local_data.clear()
+        globals.known_clocks.clear()
+        globals.last_write.clear()
+        globals.node_id = -1
         return "", 200
 
 
