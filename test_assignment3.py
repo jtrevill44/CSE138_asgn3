@@ -248,8 +248,6 @@ class TestAssignment1(unittest.TestCase):
 
         self.assertEqual(val0, val1, 'Bad tie-breaking')
 
-    ## PROBLEM
-    # error at 277
     def test_key_list(self):
         res = put(kvs_view_admin_url(ports[0], hosts[0]),
                   put_view_body(view_addresses))
