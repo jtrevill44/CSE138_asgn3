@@ -62,7 +62,7 @@ def propogate_writes(key):
             if request.method == 'PUT':
                 if globals.last_write[key] < other_id: # the vaue we have right now wins!
                     combine(globals.local_clocks, key, other_clock.get(key, len(globals.current_view)))
-                    combine(globals.known_clocks, key, globals.local_clocks.get(key, [0], len(globals.current_view)))
+                    combine(globals.known_clocks, key, globals.local_clocks.get(key, [0] * len(globals.current_view)))
                     return"", 200
                 else: # we're gonna do the put
                     if key not in globals.local_data.keys():
@@ -71,7 +71,7 @@ def propogate_writes(key):
                         returnVal = 200
                     globals.local_data[key] = val # set the actual value
                     combine(globals.local_clocks, key, other_clock.get(key, len(globals.current_view)))
-                    combine(globals.known_clocks, key, globals.local_clocks.get(key, [0], len(globals.current_view)))
+                    combine(globals.known_clocks, key, globals.local_clocks.get(key, [0] * len(globals.current_view)))
                     globals.last_write[key] = other_id
                     return "", returnVal
             else: # it is a delete!
@@ -81,7 +81,7 @@ def propogate_writes(key):
                      if key in globals.local_data.keys():
                         globals.local_data[key] = None
                         combine(globals.local_clocks, key, other_clock.get(key, len(globals.current_view)))
-                        combine(globals.known_clocks, key, globals.local_clocks.get(key, [0], len(globals.current_view)))
+                        combine(globals.known_clocks, key, globals.local_clocks.get(key, [0] * len(globals.current_view)))
                         globals.last_write[key] = other_id
                         return "", 200
                      else:
