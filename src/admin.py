@@ -46,7 +46,7 @@ def handle_views():
                 continue
         # Nodes that were to be deleted are now deleted!
         globals.current_view = new_view
-        globals.node_id = find_index() # get our new ID
+        globals.node_id = globals.current_view.index(globals.address) # get our new ID
         
         for node in new_view: # send the new view and state to all nodes!
             if node == globals.address:

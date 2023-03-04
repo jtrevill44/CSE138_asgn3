@@ -4,12 +4,39 @@ import globals
 from broadcast import broadcast
 from vector_clocks import *
 import asyncio
+from datetime import datetime
+from flask_json_schema import JsonValidationError
+from app import schema
+from app import app
+
+pd_schema = {
+    'required': ['val'],
+    'properties': {
+        'val': { 'type': 'string' },
+        'causal-metadata': { 'type': 'string' },
+    }
+}
+
+g_schema = {
+    'required': [''],
+    'properties': {
+        'causal-metadata': { 'type': 'string' },
+    }
+}
+
+@app.errorhandler(JsonValidationError)
+def validation_error(e):
+    return jsonify({ 'error': 'bad request'}), 400
 
 client_side = Blueprint('client_side', __name__, url_prefix= '/kvs/data')
 EIGHT_MEGABYTES = 8388608
 
 @client_side.route('/<key>', methods = ['PUT', 'DELETE'])
+@schema.validate(pd_schema)
 def handle_put(key):
+  if key is None:
+     return jsonify({"causal-metadata" : causal_metadata, "error" : "bad request"}), 400
+
   if (len(request.url) > 2048):
      return jsonify(error='URL is too large'), 414
 
@@ -61,7 +88,9 @@ def handle_put(key):
   
 
 @client_side.route("/<key>", methods=["GET"])
+@schema.validate(g_schema)
 def get(key):
+    start_time = datetime.now()
     if (len(request.url) > 2048):
      return jsonify(error='URL is too large'), 414
 
@@ -127,6 +156,11 @@ def get(key):
         #update internal information
         globals.local_clocks[key] = newest_clock
         globals.local_data[key] = newest_value
+        globals.last_write[key] = last_writer
+
+        if ((datetime.now() - start_time).total_seconds() >= 20):
+           return jsonify({"causal-metadata" : request_clock, "error" : "timed out while waiting for depended updates"}), 500
+           
     #now we know our internal information is synced at least to where the client was, 
     #so everything is causally consistent. 
 

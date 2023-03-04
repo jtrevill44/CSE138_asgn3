@@ -6,8 +6,8 @@ from kvs import get_all
 from sync import sync_2
 import os
 import globals
-from apscheduler.schedulers.background import BackgroundScheduler
 from flask_apscheduler import APScheduler
+from flask_json_schema import JsonSchema
 
 def is_valid_ipv4_address(ip):
     parts = ip.split('.')
@@ -21,6 +21,7 @@ def is_valid_ipv4_address(ip):
 
 
 app = Flask(__name__)
+schema = JsonSchema(app)
 scheduler = APScheduler()
 track_var = 0
 
