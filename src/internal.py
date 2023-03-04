@@ -3,7 +3,6 @@ import requests
 import globals
 from broadcast import broadcast
 from vector_clocks import *
-import pdb
 
 
 internal = Blueprint("internal", __name__, url_prefix="/kvs/internal")
