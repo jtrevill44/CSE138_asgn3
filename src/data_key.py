@@ -29,6 +29,8 @@ def handle_put(key):
   if request.method == 'PUT':
     if len(val) > EIGHT_MEGABYTES:
       return jsonify(error="val too large"), 400
+    if val is None:
+      return jsonify(error="bad request"), 400
 
   return_code = 200 if key in globals.local_data else 201
 
