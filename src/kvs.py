@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from vector_clocks import *
 from globals import *
 from broadcast import broadcast
-from vector_clocks import compare
+from vector_clocks import compare, combine
 import asyncio
 
 get_all = Blueprint("get_all", __name__)
@@ -35,11 +35,19 @@ def kvs():
             json = data.json()
             clocks = json.get('vector_clock')
             kvs_data = json.get('kvs')
+            last_writer = json.get('last-write')
             #compare all their data against ours, if theirs is ahead, update to it
             for key, value in kvs_data.items():
-                if compare(local_clocks, key, clocks.get(key, [0] * len(current_view))) < 0:
+                if compare(local_clocks, key, clocks.get(key, [0] * len(current_view))) == -1:
                     local_clocks[key] = clocks.get(key)
                     local_data[key] = kvs_data.get(key)
+                    last_write[key] = last_writer
+                elif compare(local_clocks, key, clocks.get(key, [0] * len(current_view))) == 0:
+                    combine(local_clocks, key, clocks.get(key))
+                    if last_writer < last_write.get(key, len(current_view)):
+                        local_data[key] = kvs_data.get(key)
+                        last_write[key] = last_writer
+
         #check if we're behind the request at all
         behind = False
         for key, value in causal_metadata:
