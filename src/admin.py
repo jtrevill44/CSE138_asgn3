@@ -24,7 +24,7 @@ def handle_views():
     if request.method == 'GET':
         body = request.get_json()
 
-        if len(body.keys()) >= 1:
+        if len(body.keys()) >= 1 and 'causal-metadata' not in body.keys():
             return jsonify({"error" : "bad request"}), 400
 
         return jsonify(view=globals.current_view), 200

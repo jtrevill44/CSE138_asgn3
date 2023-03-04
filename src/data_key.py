@@ -28,7 +28,10 @@ def handle_put(key):
     request_clock = None
   val = body.get('val')
 
-  if 'val' not in body.keys() or len(body.keys()) > 2:
+  if request.method == 'PUT' and ('val' not in body.keys() or len(body.keys()) > 2):
+     return jsonify({"causal-metadata" : causal_metadata, "error" : "bad request"}), 400
+  
+  if request.method == 'DELETE' and ('causal-metadata' not in body.keys() and len(body.keys()) > 1):
      return jsonify({"causal-metadata" : causal_metadata, "error" : "bad request"}), 400
 
   if key is None:
