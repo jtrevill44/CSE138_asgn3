@@ -145,8 +145,11 @@ def get(key):
 
         #update internal information
         globals.local_clocks[key] = newest_clock
+        combine(globals.known_clocks, key, newest_clock)
         globals.local_data[key] = newest_value
         globals.last_write[key] = last_writer
+
+
 
         if ((datetime.now() - start_time).total_seconds() >= 20):
            return jsonify({"causal-metadata" : request_clock, "error" : "timed out while waiting for depended updates"}), 500
