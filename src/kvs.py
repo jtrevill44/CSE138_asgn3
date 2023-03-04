@@ -9,6 +9,9 @@ get_all = Blueprint("get_all", __name__)
 
 @get_all.route('/kvs/data', methods=['GET'])
 def kvs():
+    if (globals.node_id == -1):
+      return jsonify({"causal-metadata" : causal_metadata, 'error' : 'uninitialized'}), 418
+
     #get the data from the request
     request_json = request.get_json()
     causal_metadata = request_json.get('causal_metadata', None)
