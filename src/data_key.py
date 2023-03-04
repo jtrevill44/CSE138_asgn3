@@ -125,7 +125,10 @@ def get(key):
         for r in responses:
             if(r == -1):
                 continue
-            json = r.json()
+            try:
+              json = r.json()
+            except:
+               continue
             response_clock = json.get('vector_clock')
             if compare(json, 'vector_clock', newest_clock) == -1:
                 #if the request clock is behind ours ignore it
@@ -149,7 +152,7 @@ def get(key):
         globals.last_write[key] = last_writer
 
         if ((datetime.now() - start_time).total_seconds() >= 20):
-           return jsonify({"causal-metadata" : request_clock, "error" : "timed out while waiting for depended updates"}), 500
+           return jsonify({"causal-metadata" : globals.known_clocks, "error" : "timed out while waiting for depended updates"}), 500
            
     #now we know our internal information is synced at least to where the client was, 
     #so everything is causally consistent. 

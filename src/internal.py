@@ -11,7 +11,7 @@ internal = Blueprint("internal", __name__, url_prefix="/kvs/internal")
 def propogate_writes(key):
 
     body = request.get_json()
-    other_clock = dict(body.get('vector_clock'))
+    other_clock = body.get('vector_clock')
     val = body.get('val')
     other_id = body.get('id')
     source = body.get('source')
