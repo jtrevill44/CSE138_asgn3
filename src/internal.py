@@ -7,13 +7,6 @@ from vector_clocks import *
 
 internal = Blueprint("internal", __name__, url_prefix="/kvs/internal")
 
-def in_view():
-  body = request.get_json()
-  ip = body.get('source')
-  if ip not in globals.current_view:
-    return False
-  return True
-
 @internal.route('/replicate/<key>', methods = ['GET', 'PUT', 'DELETE'])
 def propogate_writes(key):
 
@@ -92,6 +85,9 @@ def propogate_writes(key):
 
 @internal.route('/kvs', methods=['GET'])
 def get_all():
+    if source not in globals.current_view:
+        return "",403 # node was not in the view!
+
     body = request.get_json()
     other_id = body.get('id')
     source = body.get('source')
@@ -109,12 +105,12 @@ def sync_kvs_local_clocks():
         if compare(globals.local_clocks, key, got_clocks.get(key, None)) == -1:
             globals.local_data[key] = got_data.get(key, None)
             globals.local_clocks[key] = got_clocks.get(key, None)
-            globals.last_write[key] = got_last_write(key, None)
-        elif compare(globals.local_clocks, key, got_clocks.get(key, None)) == 0 and globals.current_view.index(globals.last_write.get(key, None)) > globals.current_view.index(got_last_write.get(key, None)):
+            globals.last_write[key] = got_last_write.get(key, None)
+        elif compare(globals.local_clocks, key, got_clocks.get(key, None)) == 0 and globals.last_write.get(key, None) > got_last_write.get(key, None):
             globals.local_data[key] = got_data.get(key, None)
             combine(globals.local_clocks, key, got_clocks.get(key, None))
-            globals.last_write[key] = got_last_write(key, None)
-        elif compare(globals.local_clocks, key, got_clocks.get(key, None)) == 0 and globals.current_view.index(globals.last_write.get(key, None)) <= globals.current_view.index(got_last_write.get(key, None)):
+            globals.last_write[key] = got_last_write.get(key, None)
+        elif compare(globals.local_clocks, key, got_clocks.get(key, None)) == 0 and globals.last_write.get(key, None) <= got_last_write.get(key, None):
             combine(globals.local_clocks, key, got_clocks.get(key, None))
         # maybe sanity check if the vector clocks are the same?
     return jsonify(success='updated clocks from sync'), 200
