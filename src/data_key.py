@@ -97,7 +97,7 @@ def get(key):
     while(compare(globals.local_clocks, key, causal_metadata.get(key, [0]*len(globals.current_view)))<=0):
         #if internal behind, check with other replica's for updates. 
         #either a response with the newer vector clock, or hang
-        responses = asyncio.run(broadcast("GET", f"/kvs/internal/replicate/{key}", key, causal_metadata[key]))
+        responses = asyncio.run(broadcast("GET", f"/kvs/internal/replicate/{key}", key, causal_metadata[key], val=None, node_id=globals.node_id, source= globals.address))
         #tmp variable to hold the newst list/val seen
         newest_clock = globals.local_clocks.get(key, [0] * len(globals.current_view))
         newest_value = globals.local_data.get(key)
