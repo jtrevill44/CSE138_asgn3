@@ -62,6 +62,8 @@ def handle_put(key):
 
 @client_side.route("/<key>", methods=["GET"])
 def get(key):
+    if (len(request.url) > 2048):
+     return jsonify(error='URL is too large'), 414
 
     #get the json object from the request
     json = request.get_json()

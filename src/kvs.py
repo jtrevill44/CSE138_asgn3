@@ -9,6 +9,9 @@ get_all = Blueprint("get_all", __name__)
 
 @get_all.route('/kvs/data', methods=['GET'])
 def kvs():
+    if (len(request.url) > 2048):
+     return jsonify(error='URL is too large'), 414
+
     if (globals.node_id == -1):
       return jsonify({"causal-metadata" : causal_metadata, 'error' : 'uninitialized'}), 418
 
