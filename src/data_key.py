@@ -19,9 +19,6 @@ def handle_put(key):
   # get body and data
   body = request.get_json()
 
-  if 'val' not in body.keys() or len(body.keys()) > 2:
-     return jsonify({"causal-metadata" : causal_metadata, "error" : "bad request"}), 400
-
   causal_metadata = body.get('causal-metadata', None)
   if causal_metadata is not None:
     update_known_clocks(causal_metadata)
@@ -30,6 +27,9 @@ def handle_put(key):
     causal_metadata = dict()
     request_clock = None
   val = body.get('val')
+
+  if 'val' not in body.keys() or len(body.keys()) > 2:
+     return jsonify({"causal-metadata" : causal_metadata, "error" : "bad request"}), 400
 
   if key is None:
      return jsonify({"causal-metadata" : causal_metadata, "error" : "bad request"}), 400
