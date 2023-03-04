@@ -17,10 +17,12 @@ def kvs():
     causal_metadata = request_json.get('causal_metadata', None)
     if causal_metadata != None:
         update_known_clocks(causal_metadata)
+    else:
+        causal_metadata = dict()
     #loop til we're up to date with the request's clocks
     while(True):
         #get the info from all the other nodes
-        datas = asyncio.run(broadcast('GET', '/internal/kvs', '',[], ''))
+        datas = asyncio.run(broadcast('GET', '/kvs/internal/kvs', '',[], ''))
         #loop through the responses 
         for data in datas:
             #if dead, skip
@@ -31,7 +33,7 @@ def kvs():
             clocks = json.get('vector_clock')
             kvs_data = json.get('kvs')
             #compare all their data against ours, if theirs is ahead, update to it
-            for key, value in kvs_data:
+            for key, value in kvs_data.items():
                 if compare(local_clocks, key, clocks.get(key, [0] * len(current_view))) < 0:
                     local_clocks[key] = clocks.get(key)
                     local_data[key] = kvs_data.get(key)
@@ -46,4 +48,4 @@ def kvs():
             break
         
     #return keys of all data
-    return jsonify({"count" : len(local_clocks), "keys" : local_data.keys(), "causal-metadata" : known_clocks}), 200
+    return jsonify({"count" : len(local_clocks), "keys" : list(local_data.keys()), "causal-metadata" : known_clocks}), 200
