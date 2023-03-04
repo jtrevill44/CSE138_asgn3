@@ -89,8 +89,6 @@ def get_all():
     body = request.get_json()
     other_id = body.get('id')
     source = body.get('source')
-    print(source)
-    print(globals.current_view)
 
     if source not in globals.current_view:
         return "",403 # node was not in the view!
