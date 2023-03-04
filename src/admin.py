@@ -16,7 +16,7 @@ admin = Blueprint("admin", __name__, url_prefix="/kvs/admin")
 def handle_views():
 
     if (globals.node_id == -1) and request.method == 'DELETE':
-      return jsonify({"causal-metadata" : causal_metadata, 'error' : 'uninitialized'}), 418
+      return jsonify({'error' : 'uninitialized'}), 418
 
     if request.method == 'GET':
         return jsonify(view=globals.current_view), 200
