@@ -7,12 +7,13 @@ import asyncio
 
 get_all = Blueprint("get_all", __name__)
 
-@get_all.route('/data/kvs', methods=['GET'])
+@get_all.route('/kvs/data', methods=['GET'])
 def kvs():
     #get the data from the request
     request_json = request.get_json()
     causal_metadata = request_json.get('causal_metadata', None)
-    update_known_clocks(causal_metadata)
+    if causal_metadata != None:
+        update_known_clocks(causal_metadata)
     #loop til we're up to date with the request's clocks
     while(True):
         #get the info from all the other nodes

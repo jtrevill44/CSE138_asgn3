@@ -4,7 +4,7 @@ import requests
 import threading
 import os
 import asyncio
-import broadcast
+from broadcast import broadcast
 
 
 def send_request():
@@ -19,6 +19,6 @@ def sync():
     globals.syncThread = threading.Thread(target=send_request())
 
 def sync_2():
-    asyncio.run(broadcast('PUT', '/kvs/internal/sync', globals.local_data, globals.local_clocks, globals.last_write))
+    asyncio.run(broadcast('PUT', '/kvs/internal/sync', globals.local_data, globals.local_clocks, node_id=globals.last_write))
     
         

@@ -116,3 +116,4 @@ def sync_kvs_local_clocks():
             combine(globals.local_clocks, key, got_clocks[key])
             globals.last_write[key] = got_last_write[key]
         # maybe sanity check if the vector clocks are the same?
+    return jsonify(success='updated clocks from sync'), 200

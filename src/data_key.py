@@ -14,20 +14,18 @@ def handle_put(key):
   # get body and data
   body = request.get_json()
 
-  temp = body.get('causal-metadata', None)
-  if temp is not None:
-    causal_metadata = dict(body.get('causal-metadata', None))
+  causal_metadata = body.get('causal-metadata', None)
+  if causal_metadata is not None:
     update_known_clocks(causal_metadata)
     request_clock = causal_metadata.get(key, None)
   else:
     causal_metadata = dict()
-    request_clock = list()
+    request_clock = None
   val = body.get('val')
-  update_known_clocks(causal_metadata)
 
-  
-  if len(val) > EIGHT_MEGABYTES:
-    return jsonify(error="val too large"), 400
+  if request.method == 'PUT':
+    if len(val) > EIGHT_MEGABYTES:
+      return jsonify(error="val too large"), 400
 
   return_code = 200 if key in globals.local_data else 201
 
@@ -75,7 +73,7 @@ def get(key):
     if (globals.local_data.get(key, None) == None):
        responses = asyncio.run(broadcast('GET', f'http://kvs/internal/replicate/{key}', key, globals.local_clocks))
        for response in responses:
-          if response is not 404 and compare(globals.local_clocks, key, dict(response.get_json().get('causal-metadata', None))[key]) == -1:
+          if response != 404 and compare(globals.local_clocks, key, dict(response.get_json().get('causal-metadata', None))[key]) == -1:
              globals.local_data[key] = int(response.get_json().get('val'))
              globals.local_clocks[key] = dict(response.get_json().get('causal-metadata', None))[key]
     
