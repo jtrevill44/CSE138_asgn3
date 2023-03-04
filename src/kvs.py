@@ -22,6 +22,10 @@ def kvs():
         update_known_clocks(causal_metadata)
     else:
         causal_metadata = dict()
+
+    if len(request_json) > 1:
+        return jsonify({"causal-metadata" : causal_metadata, "error" : "bad request"}), 400
+    
     #loop til we're up to date with the request's clocks
     while(True):
         #get the info from all the other nodes

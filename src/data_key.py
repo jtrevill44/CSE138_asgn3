@@ -5,43 +5,22 @@ from broadcast import broadcast
 from vector_clocks import *
 import asyncio
 from datetime import datetime
-from flask_json_schema import JsonValidationError
-from app import schema
-from app import app
 
-pd_schema = {
-    'required': ['val'],
-    'properties': {
-        'val': { 'type': 'string' },
-        'causal-metadata': { 'type': 'string' },
-    }
-}
-
-g_schema = {
-    'required': [''],
-    'properties': {
-        'causal-metadata': { 'type': 'string' },
-    }
-}
-
-@app.errorhandler(JsonValidationError)
-def validation_error(e):
-    return jsonify({ 'error': 'bad request'}), 400
 
 client_side = Blueprint('client_side', __name__, url_prefix= '/kvs/data')
 EIGHT_MEGABYTES = 8388608
 
 @client_side.route('/<key>', methods = ['PUT', 'DELETE'])
-@schema.validate(pd_schema)
 def handle_put(key):
-  if key is None:
-     return jsonify({"causal-metadata" : causal_metadata, "error" : "bad request"}), 400
 
   if (len(request.url) > 2048):
      return jsonify(error='URL is too large'), 414
 
   # get body and data
   body = request.get_json()
+
+  if 'val' not in body.keys() or len(body.keys()) > 2:
+     return jsonify({"causal-metadata" : causal_metadata, "error" : "bad request"}), 400
 
   causal_metadata = body.get('causal-metadata', None)
   if causal_metadata is not None:
@@ -51,6 +30,9 @@ def handle_put(key):
     causal_metadata = dict()
     request_clock = None
   val = body.get('val')
+
+  if key is None:
+     return jsonify({"causal-metadata" : causal_metadata, "error" : "bad request"}), 400
 
   if (globals.node_id == -1):
       return jsonify({"causal-metadata" : causal_metadata, 'error' : 'uninitialized'}), 418
@@ -88,7 +70,6 @@ def handle_put(key):
   
 
 @client_side.route("/<key>", methods=["GET"])
-@schema.validate(g_schema)
 def get(key):
     start_time = datetime.now()
     if (len(request.url) > 2048):
@@ -106,6 +87,12 @@ def get(key):
     else:
        causal_metadata = dict()
        request_clock = list()
+
+    if 'causal-metadata' not in json.keys() and len(json.keys()) >= 1:
+       return jsonify({"causal-metadata" : causal_metadata, "error" : "bad request"}), 400
+    
+    if key is None:
+       return jsonify({"causal-metadata" : causal_metadata, "error" : "bad request"}), 400
 
     if (globals.node_id == -1):
       return jsonify({"causal-metadata" : causal_metadata, 'error' : 'uninitialized'}), 418

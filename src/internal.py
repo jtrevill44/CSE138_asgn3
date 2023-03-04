@@ -31,7 +31,7 @@ def propogate_writes(key):
         if request.method == 'PUT':
             if comparison == -1:
                 copy_key(globals.local_clocks, key, other_clock[key]) # copy the new key into ours!
-                combine(globals.known_clocks, key, globals.local_clocks.get(key, [0], len(globals.current_view)))
+                combine(globals.known_clocks, key, globals.local_clocks.get(key, [0] * len(globals.current_view)))
             
             if key not in globals.local_data.keys():
                 returnVal = 201
@@ -44,7 +44,7 @@ def propogate_writes(key):
         if request.method == 'DELETE':
             if comparison == -1:
                copy_key(globals.local_clocks, key, other_clock[key]) # copy the new key into ours!
-               combine(globals.known_clocks, key, globals.local_clocks.get(key, [0], len(globals.current_view)))
+               combine(globals.known_clocks, key, globals.local_clocks.get(key, [0] * len(globals.current_view)))
 
             if key in globals.local_data.keys():
                 globals.local_data[key] = None

@@ -7,7 +7,6 @@ from sync import sync_2
 import os
 import globals
 from flask_apscheduler import APScheduler
-from flask_json_schema import JsonSchema
 
 def is_valid_ipv4_address(ip):
     parts = ip.split('.')
@@ -21,7 +20,6 @@ def is_valid_ipv4_address(ip):
 
 
 app = Flask(__name__)
-schema = JsonSchema(app)
 scheduler = APScheduler()
 track_var = 0
 
@@ -39,7 +37,6 @@ app.register_blueprint(admin, url_prefix="/kvs/admin")
 app.register_blueprint(internal, url_prefix="/kvs/internal")
 app.register_blueprint(client_side, url_prefix="/kvs/data")
 app.register_blueprint(get_all)
-
 
 if __name__ == "__main__":
     if track_var == 1:

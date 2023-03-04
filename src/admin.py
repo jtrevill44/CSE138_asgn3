@@ -22,6 +22,11 @@ def handle_views():
       return jsonify({'error' : 'uninitialized'}), 418
 
     if request.method == 'GET':
+        body = request.get_json()
+
+        if len(body.keys()) >= 1:
+            return jsonify({"error" : "bad request"}), 400
+
         return jsonify(view=globals.current_view), 200
 
 
@@ -36,6 +41,10 @@ def handle_views():
 
     elif request.method == 'PUT': # here comes all the complexity :)
         body = request.get_json()
+
+        if 'view' not in body.keys() or len(body.keys()) > 1:
+            return jsonify({"error" : "bad request"}), 400
+
         new_view = body.get('view') # this is the new view!
         deleted_nodes = [x for x in globals.current_view if x not in new_view] # nodes to delete
         for node in deleted_nodes:
