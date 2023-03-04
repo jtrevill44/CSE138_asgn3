@@ -97,7 +97,7 @@ def get_all():
     other_id = body.get('id')
     source = body.get('source')
     other_clock = dict(body.get('vector_clock'))
-    return jsonify(vector_clock= globals.local_clocks, kvs= globals.local_data), 200
+    return jsonify(vector_clock= globals.local_clocks, kvs= globals.local_data, last_write= globals.last_write), 200
 
 @internal.route('/sync', methods=['PUT'])
 def sync_kvs_local_clocks():
