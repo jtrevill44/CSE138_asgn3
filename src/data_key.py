@@ -11,9 +11,6 @@ EIGHT_MEGABYTES = 8388608
 @client_side.route('/<key>', methods = ['PUT', 'DELETE'])
 def handle_put(key):
 
-  if (globals.node_id == -1):
-      return jsonify({"causal-metadata" : causal_metadata, 'error' : 'uninitialized'}), 418
-
   # get body and data
   body = request.get_json()
 
@@ -25,6 +22,9 @@ def handle_put(key):
     causal_metadata = dict()
     request_clock = None
   val = body.get('val')
+
+  if (globals.node_id == -1):
+      return jsonify({"causal-metadata" : causal_metadata, 'error' : 'uninitialized'}), 418
 
   if request.method == 'PUT':
     if len(val) > EIGHT_MEGABYTES:
@@ -58,9 +58,6 @@ def handle_put(key):
 
 @client_side.route("/<key>", methods=["GET"])
 def get(key):
-    
-    if (globals.node_id == -1):
-      return jsonify({"causal-metadata" : causal_metadata, 'error' : 'uninitialized'}), 418
 
     #get the json object from the request
     json = request.get_json()
@@ -74,6 +71,9 @@ def get(key):
     else:
        causal_metadata = dict()
        request_clock = list()
+
+    if (globals.node_id == -1):
+      return jsonify({"causal-metadata" : causal_metadata, 'error' : 'uninitialized'}), 418
 
     # if key is not found in local kvs, broadcast get to all other nodes and check if they have key
     if (globals.local_data.get(key, None) == None and request_clock != None):
