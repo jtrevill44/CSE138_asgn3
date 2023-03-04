@@ -106,15 +106,15 @@ def sync_kvs_local_clocks():
     got_last_write = dict(json.get('id'))
     all_keys = set().union(globals.local_data.keys(), got_data.keys())
     for key in all_keys:
-        if compare(globals.local_clocks, key, got_clocks[key]) == -1:
-            globals.local_data[key] = got_data[key]
-            globals.local_clocks[key] = got_clocks[key]
-            globals.last_write[key] = got_last_write[key]
-        elif compare(globals.local_clocks, key, got_clocks[key]) == 0 and globals.current_view.index(globals.last_write[key]) > globals.current_view.index(got_last_write[key]):
-            globals.local_data[key] = got_data[key]
-            combine(globals.local_clocks, key, got_clocks[key])
-            globals.last_write[key] = got_last_write[key]
-        elif compare(globals.local_clocks, key, got_clocks[key]) == 0 and globals.current_view.index(globals.last_write[key]) <= globals.current_view.index(got_last_write[key]):
-            combine(globals.local_clocks, key, got_clocks[key])
+        if compare(globals.local_clocks, key, got_clocks.get(key, None)) == -1:
+            globals.local_data[key] = got_data.get(key, None)
+            globals.local_clocks[key] = got_clocks.get(key, None)
+            globals.last_write[key] = got_last_write(key, None)
+        elif compare(globals.local_clocks, key, got_clocks.get(key, None)) == 0 and globals.current_view.index(globals.last_write.get(key, None)) > globals.current_view.index(got_last_write.get(key, None)):
+            globals.local_data[key] = got_data.get(key, None)
+            combine(globals.local_clocks, key, got_clocks.get(key, None))
+            globals.last_write[key] = got_last_write(key, None)
+        elif compare(globals.local_clocks, key, got_clocks.get(key, None)) == 0 and globals.current_view.index(globals.last_write.get(key, None)) <= globals.current_view.index(got_last_write.get(key, None)):
+            combine(globals.local_clocks, key, got_clocks.get(key, None))
         # maybe sanity check if the vector clocks are the same?
     return jsonify(success='updated clocks from sync'), 200

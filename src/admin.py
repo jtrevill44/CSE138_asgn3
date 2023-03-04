@@ -15,6 +15,9 @@ admin = Blueprint("admin", __name__, url_prefix="/kvs/admin")
 @admin.route('/view', methods = ['GET', 'PUT', 'DELETE'])
 def handle_views():
 
+    if (len(request.url) > 2048):
+     return jsonify(error='URL is too large'), 414
+
     if (globals.node_id == -1) and request.method == 'DELETE':
       return jsonify({'error' : 'uninitialized'}), 418
 

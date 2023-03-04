@@ -62,6 +62,8 @@ def handle_put(key):
 
 @client_side.route("/<key>", methods=["GET"])
 def get(key):
+    if (len(request.url) > 2048):
+     return jsonify(error='URL is too large'), 414
 
     #get the json object from the request
     json = request.get_json()
@@ -95,18 +97,33 @@ def get(key):
     while(compare(globals.local_clocks, key, causal_metadata.get(key, [0]*len(globals.current_view)))<=0):
         #if internal behind, check with other replica's for updates. 
         #either a response with the newer vector clock, or hang
-        responses = asyncio.run(broadcast("GET", "/internal/read", key, causal_metadata[key]))
+        responses = asyncio.run(broadcast("GET", f"/kvs/internal/replicate/{key}", key, causal_metadata[key]))
         #tmp variable to hold the newst list/val seen
         newest_clock = globals.local_clocks.get(key, [0] * len(globals.current_view))
         newest_value = globals.local_data.get(key)
+        last_writer = globals.last_write.get(key)
         #find most updated vector clock, and take it's value
         for r in responses:
             if(r == -1):
                 continue
             json = r.json()
-            if(compare(json, 'vector_clock', newest_clock)>0):
-                newest_clock = json.get('vector_clock')
+            response_clock = json.get('vector_clock')
+            if compare(json, 'vector_clock', newest_clock) == -1:
+                #if the request clock is behind ours ignore it
+                pass
+            elif(compare(json, 'vector_clock', newest_clock)==0):
+                #if the request clock is concurrent, tie break and combine clocks
+                if last_writer > json.get('last-write'):
+                    newest_value = json.get('val')
+                    last_writer = json.get('last-write')
+                for index in range(len(newest_clock)):
+                    newest_clock[index] = max(newest_clock[index],request_clock[index])
+            elif(compare(json, 'vector_clock', newest_clock) == 1):
+                #otherwise the client clock is in the future
+                newest_clock = request_clock
                 newest_value = json.get('val')
+                last_writer = json.get('last-write')
+
         #update internal information
         globals.local_clocks[key] = newest_clock
         globals.local_data[key] = newest_value
