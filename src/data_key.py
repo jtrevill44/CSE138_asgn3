@@ -10,6 +10,8 @@ EIGHT_MEGABYTES = 8388608
 
 @client_side.route('/<key>', methods = ['PUT', 'DELETE'])
 def handle_put(key):
+  if (len(request.url) > 2048):
+     return jsonify(error='URL is too large'), 414
 
   # get body and data
   body = request.get_json()
