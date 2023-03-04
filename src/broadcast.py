@@ -8,15 +8,18 @@ async def async_request(ip, path, method, key = None, vector_clock = dict(), val
   # path needs to include the /<key> if that endpoint needs one
   state = {"key": key, "val": val, "vector_clock" : vector_clock, "id" : node_id, "source" : source}
   # print(state)
+  request = []
   try:
     if method == 'PUT':
-      return requests.put(url, json=state, timeout=(2))
+      request = requests.put(url, json=state, timeout=(2))
     elif method == 'GET':
-      return requests.get(url, json=state, timeout=(2))
+      request = requests.get(url, json=state, timeout=(2))
     else:
-      return requests.delete(url, json=state, timeout=(2))
+      request = requests.delete(url, json=state, timeout=(2))
   except:
     return -1
+  
+  return request
 
 # Input:
 #   method: the method on the end point in string form
