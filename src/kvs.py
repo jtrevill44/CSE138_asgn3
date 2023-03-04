@@ -44,6 +44,7 @@ def kvs():
             for key, value in kvs_data.items():
                 if compare(local_clocks, key, clocks.get(key, [0] * len(current_view))) == -1:
                     local_clocks[key] = clocks.get(key)
+                    combine(known_clocks, key, clocks.get(key))
                     local_data[key] = kvs_data.get(key)
                     last_write[key] = last_writer
                 elif compare(local_clocks, key, clocks.get(key, [0] * len(current_view))) == 0:
