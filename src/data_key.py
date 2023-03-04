@@ -11,6 +11,9 @@ EIGHT_MEGABYTES = 8388608
 @client_side.route('/<key>', methods = ['PUT', 'DELETE'])
 def handle_put(key):
 
+  if (globals.node_id == -1):
+      return jsonify({"causal-metadata" : causal_metadata, 'error' : 'uninitialized'}), 418
+
   # get body and data
   body = request.get_json()
 
