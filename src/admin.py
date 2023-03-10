@@ -54,14 +54,23 @@ def handle_views():
             except: # could be a partition or something, its fine!
                 continue
         # Nodes that were to be deleted are now deleted!
+
+        if len(globals.current_view) < len(new_view):
+            for key in globals.local_clocks.keys():
+                globals.local_clocks[key].extend([0] * len(new_view) - len(globals.local_clocks))
+            for key in globals.known_clocks.keys():
+                globals.known_clocks[key].extend([0] * len(new_view) - len(globals.known_clocks))
+
+
         globals.current_view = new_view
         globals.node_id = globals.current_view.index(globals.address) # get our new ID
+
         
         for node in new_view: # send the new view and state to all nodes!
             if node == globals.address:
                 continue
             url = f"http://{node}/kvs/admin/update"
-            state = {"view":new_view, "kvs":globals.local_data, "vector_clock":globals.local_clocks}
+            state = {"view":new_view, "kvs":globals.local_data, "vector_clock":globals.local_clocks, "known_clock" : globals.known_clocks}
             try:
                 requests.put(url, json=state, timeout=1)
             except: 
@@ -80,6 +89,7 @@ def handle_update(): # function and end point for updating nodes with a view upd
     globals.current_view = body.get('view')
     globals.local_data = body.get('kvs')
     globals.local_clocks = body.get('vector_clock')
+    globals.known_clocks = body.get('known_clock')
     globals.node_id = find_index()
     # globals.syncThread.start()
     return "", 200
