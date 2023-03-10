@@ -57,9 +57,9 @@ def handle_views():
 
         if len(globals.current_view) < len(new_view):
             for key in globals.local_clocks.keys():
-                globals.local_clocks[key].extend([0] * len(new_view) - len(globals.current_view))
+                globals.local_clocks[key].extend([0] * (len(new_view) - len(globals.current_view)))
             for key in globals.known_clocks.keys():
-                globals.known_clocks[key].extend([0] * len(new_view) - len(globals.current_view))
+                globals.known_clocks[key].extend([0] * (len(new_view) - len(globals.current_view)))
 
 
         globals.current_view = new_view
