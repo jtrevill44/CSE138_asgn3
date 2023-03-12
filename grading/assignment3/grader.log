@@ -1,30 +1,56 @@
-time="2023-03-10T15:29:14-08:00" level=info msg="Graded using github.com/AKarbas/cse138-kuber-grader" group=jtrevill
-time="2023-03-10T15:29:14-08:00" level=info msg="Starting test 1" group=jtrevill
-time="2023-03-10T15:29:14-08:00" level=info msg="this test runs on a healthy network and checks if simple view and data operations are successful. max score in test: 80" group=jtrevill numKeys=10 numNodes=3 test=BasicKeyVal
-time="2023-03-10T15:29:24-08:00" level=info msg="score +10 - put view successful" group=jtrevill numKeys=10 numNodes=3 test=BasicKeyVal
-time="2023-03-10T15:29:24-08:00" level=error msg="failed to get view: invalid character '<' looking for beginning of value" group=jtrevill numKeys=10 numNodes=3 test=BasicKeyVal
-time="2023-03-10T15:29:44-08:00" level=info msg="final score: 10" group=jtrevill numKeys=10 numNodes=3 test=BasicKeyVal
-time="2023-03-10T15:29:44-08:00" level=warning msg="test 1 did not finish with the full score." expected=80 got=10 group=jtrevill
-time="2023-03-10T15:29:44-08:00" level=info msg="Starting test 2" group=jtrevill
-time="2023-03-10T15:29:44-08:00" level=info msg="this test starts a cluster and then partitions the nodes into two parts; inserts to both parts; heals the partition; and expects the results to be the same from all nodes, including causal ordering and tie breaking. max score in test: 50" group=jtrevill numKeys=10 numNodes=4 test=PartitionedTieBreak
-time="2023-03-10T15:32:49-08:00" level=info msg="score +10 - partitioned puts successful" group=jtrevill numKeys=10 numNodes=4 test=PartitionedTieBreak
-time="2023-03-10T15:33:09-08:00" level=info msg="score +10 - partitioned gets successful" group=jtrevill numKeys=10 numNodes=4 test=PartitionedTieBreak
-time="2023-03-10T15:33:20-08:00" level=info msg="score +10 - key count after network heal successful" group=jtrevill numKeys=10 numNodes=4 test=PartitionedTieBreak
-time="2023-03-10T15:33:20-08:00" level=error msg="invalid value" expected=Val-0-1 group=jtrevill numKeys=10 numNodes=4 received=Val-0-0 test=PartitionedTieBreak
-time="2023-03-10T15:33:40-08:00" level=info msg="final score: 30" group=jtrevill numKeys=10 numNodes=4 test=PartitionedTieBreak
-time="2023-03-10T15:33:40-08:00" level=warning msg="test 2 did not finish with the full score." expected=50 got=30 group=jtrevill
-time="2023-03-10T15:33:40-08:00" level=info msg="Starting test 3" group=jtrevill
-time="2023-03-10T15:33:40-08:00" level=info msg="this test changes the view in a healthy network and checks that the data are readable in the new nodes after the view change. max score in test: 10" group=jtrevill numKeys=10 numNodes=4 test=BasicViewChange
-time="2023-03-10T15:34:25-08:00" level=info msg="score +10 - gets from new nodes successful" group=jtrevill numKeys=10 numNodes=4 test=BasicViewChange
-time="2023-03-10T15:34:46-08:00" level=info msg="final score: 10" group=jtrevill numKeys=10 numNodes=4 test=BasicViewChange
-time="2023-03-10T15:34:46-08:00" level=info msg="Starting test 4" group=jtrevill
-time="2023-03-10T15:34:46-08:00" level=info msg="this test changes the view in a partitioned network; heals the network and waits; and checks that the data are readable in the new nodes after the view change. max score in test: 10" group=jtrevill numKeys=10 numNodes=6 test=PartitionedViewChange
-I0310 15:34:59.225390   32999 request.go:690] Waited for 1.187862792s due to client-side throttling, not priority and fairness, request: PATCH:https://192.168.64.2:16443/api/v1/namespaces/default/pods/jtrevill-b3-p2?fieldManager=amin&force=true
-time="2023-03-10T15:36:11-08:00" level=info msg="score +10 - gets from new nodes after partition heal successful" group=jtrevill numKeys=10 numNodes=6 test=PartitionedViewChange
-time="2023-03-10T15:36:31-08:00" level=info msg="final score: 10" group=jtrevill numKeys=10 numNodes=6 test=PartitionedViewChange
-time="2023-03-10T15:36:31-08:00" level=info msg="Starting test 5" group=jtrevill
-time="2023-03-10T15:36:31-08:00" level=info msg="this test isolates each node and ensures that it's writable; and that after partitions are healed, all nodes contain all of the data. max score in test: 10" group=jtrevill numKeys=10 numNodes=3 test=Availability
-time="2023-03-10T15:39:14-08:00" level=error msg="invalid value" expected=Val-0-2 group=jtrevill numKeys=10 numNodes=3 received=Val-0-1 test=Availability
-time="2023-03-10T15:39:34-08:00" level=info msg="final score: 0" group=jtrevill numKeys=10 numNodes=3 test=Availability
-time="2023-03-10T15:39:34-08:00" level=warning msg="test 5 did not finish with the full score." expected=10 got=0 group=jtrevill
-time="2023-03-10T15:39:34-08:00" level=info msg="Final score overall: 0.51" group=jtrevill
+time="2023-03-11T18:31:14-08:00" level=info msg="Graded using github.com/AKarbas/cse138-kuber-grader" group=jtrevill
+time="2023-03-11T18:31:14-08:00" level=info msg="All tests that expect a non-500 status code were done after waiting for the eventual consistency period." group=jtrevill
+time="2023-03-11T18:31:14-08:00" level=info msg="After each view change or network heal, your system had 11 seconds to ensure consistency." group=jtrevill
+time="2023-03-11T18:31:14-08:00" level=info msg="All data operations were done with a time-out of 21 seconds, and \"context deadline exceeded\" means longer waits." group=jtrevill
+time="2023-03-11T18:31:14-08:00" level=info msg="Starting test 1" group=jtrevill
+time="2023-03-11T18:31:14-08:00" level=info msg="this test runs on a healthy network and checks if simple view and data operations are successful. max score in test: 80" group=jtrevill numKeys=10 numNodes=3 test=BasicKeyVal
+time="2023-03-11T18:31:24-08:00" level=info msg="score +10 - put view successful" group=jtrevill numKeys=10 numNodes=3 test=BasicKeyVal
+time="2023-03-11T18:31:34-08:00" level=error msg="failed to get view: invalid character '<' looking for beginning of value" group=jtrevill numKeys=10 numNodes=3 test=BasicKeyVal
+time="2023-03-11T18:31:54-08:00" level=info msg="final score: 10" group=jtrevill numKeys=10 numNodes=3 test=BasicKeyVal
+time="2023-03-11T18:31:54-08:00" level=warning msg="test 1 did not finish with the full score." expected=80 got=10 group=jtrevill
+time="2023-03-11T18:31:54-08:00" level=info msg="Starting test 2" group=jtrevill
+time="2023-03-11T18:31:54-08:00" level=info msg="this test starts a cluster and then partitions the nodes into two parts; inserts to both parts; heals the partition; and expects the results to be the same from all nodes, including causal ordering and tie breaking. max score in test: 50" group=jtrevill numKeys=10 numNodes=4 test=PartitionedTieBreak
+time="2023-03-11T18:34:58-08:00" level=info msg="score +10 - partitioned puts successful" group=jtrevill numKeys=10 numNodes=4 test=PartitionedTieBreak
+time="2023-03-11T18:35:18-08:00" level=info msg="score +10 - partitioned gets successful" group=jtrevill numKeys=10 numNodes=4 test=PartitionedTieBreak
+time="2023-03-11T18:35:29-08:00" level=info msg="score +10 - key count after network heal successful" group=jtrevill numKeys=10 numNodes=4 test=PartitionedTieBreak
+time="2023-03-11T18:35:29-08:00" level=warning msg="invalid value" expected=Val-0-1 group=jtrevill numKeys=10 numNodes=4 received=Val-0-0 test=PartitionedTieBreak
+time="2023-03-11T18:35:29-08:00" level=warning msg="invalid value" expected=Val-1-1 group=jtrevill numKeys=10 numNodes=4 received=Val-1-0 test=PartitionedTieBreak
+time="2023-03-11T18:35:29-08:00" level=warning msg="invalid value" expected=Val-2-1 group=jtrevill numKeys=10 numNodes=4 received=Val-2-0 test=PartitionedTieBreak
+time="2023-03-11T18:35:30-08:00" level=warning msg="invalid value" expected=Val-3-1 group=jtrevill numKeys=10 numNodes=4 received=Val-3-0 test=PartitionedTieBreak
+time="2023-03-11T18:35:30-08:00" level=warning msg="invalid value" expected=Val-4-1 group=jtrevill numKeys=10 numNodes=4 received=Val-4-0 test=PartitionedTieBreak
+time="2023-03-11T18:35:30-08:00" level=warning msg="invalid value" expected=Val-5-1 group=jtrevill numKeys=10 numNodes=4 received=Val-5-0 test=PartitionedTieBreak
+time="2023-03-11T18:35:30-08:00" level=warning msg="invalid value" expected=Val-6-1 group=jtrevill numKeys=10 numNodes=4 received=Val-6-0 test=PartitionedTieBreak
+time="2023-03-11T18:35:30-08:00" level=warning msg="invalid value" expected=Val-7-1 group=jtrevill numKeys=10 numNodes=4 received=Val-7-0 test=PartitionedTieBreak
+time="2023-03-11T18:35:30-08:00" level=warning msg="invalid value" expected=Val-8-1 group=jtrevill numKeys=10 numNodes=4 received=Val-8-0 test=PartitionedTieBreak
+time="2023-03-11T18:35:30-08:00" level=info msg="score +10 - tie-breaking after network heal successful" group=jtrevill numKeys=10 numNodes=4 test=PartitionedTieBreak
+time="2023-03-11T18:35:50-08:00" level=info msg="final score: 40" group=jtrevill numKeys=10 numNodes=4 test=PartitionedTieBreak
+time="2023-03-11T18:35:50-08:00" level=warning msg="test 2 did not finish with the full score." expected=50 got=40 group=jtrevill
+time="2023-03-11T18:35:50-08:00" level=info msg="Starting test 3" group=jtrevill
+time="2023-03-11T18:35:50-08:00" level=info msg="this test changes the view in a healthy network and checks that the data are readable in the new nodes after the view change. max score in test: 10" group=jtrevill numKeys=10 numNodes=4 test=BasicViewChange
+time="2023-03-11T18:36:35-08:00" level=info msg="score +10 - gets from new nodes successful" group=jtrevill numKeys=10 numNodes=4 test=BasicViewChange
+time="2023-03-11T18:36:55-08:00" level=info msg="final score: 10" group=jtrevill numKeys=10 numNodes=4 test=BasicViewChange
+time="2023-03-11T18:36:55-08:00" level=info msg="Starting test 4" group=jtrevill
+time="2023-03-11T18:36:55-08:00" level=info msg="this test changes the view in a partitioned network; heals the network and waits; and checks that the data are readable in the new nodes after the view change. max score in test: 10" group=jtrevill numKeys=10 numNodes=6 test=PartitionedViewChange
+I0311 18:37:08.517646   63467 request.go:690] Waited for 1.189450417s due to client-side throttling, not priority and fairness, request: PATCH:https://192.168.64.2:16443/api/v1/namespaces/default/pods/jtrevill-b1-p2?fieldManager=amin&force=true
+time="2023-03-11T18:38:20-08:00" level=info msg="score +10 - gets from new nodes after partition heal successful" group=jtrevill numKeys=10 numNodes=6 test=PartitionedViewChange
+time="2023-03-11T18:38:40-08:00" level=info msg="final score: 10" group=jtrevill numKeys=10 numNodes=6 test=PartitionedViewChange
+time="2023-03-11T18:38:40-08:00" level=info msg="Starting test 5" group=jtrevill
+time="2023-03-11T18:38:40-08:00" level=info msg="this test isolates each node and ensures that it's writable; and that after partitions are healed, all nodes contain all of the data. max score in test: 10" group=jtrevill numKeys=10 numNodes=3 test=Availability
+time="2023-03-11T18:41:20-08:00" level=warning msg="invalid value" expected=Val-0-2 group=jtrevill numKeys=10 numNodes=3 received=Val-0-1 test=Availability
+time="2023-03-11T18:41:20-08:00" level=warning msg="invalid value" expected=Val-1-2 group=jtrevill numKeys=10 numNodes=3 received=Val-1-1 test=Availability
+time="2023-03-11T18:41:20-08:00" level=warning msg="invalid value" expected=Val-1-2 group=jtrevill numKeys=10 numNodes=3 received=Val-1-1 test=Availability
+time="2023-03-11T18:41:20-08:00" level=warning msg="invalid value" expected=Val-2-2 group=jtrevill numKeys=10 numNodes=3 received=Val-2-1 test=Availability
+time="2023-03-11T18:41:20-08:00" level=warning msg="invalid value" expected=Val-2-2 group=jtrevill numKeys=10 numNodes=3 received=Val-2-1 test=Availability
+time="2023-03-11T18:41:20-08:00" level=warning msg="invalid value" expected=Val-3-2 group=jtrevill numKeys=10 numNodes=3 received=Val-3-1 test=Availability
+time="2023-03-11T18:41:20-08:00" level=warning msg="invalid value" expected=Val-4-2 group=jtrevill numKeys=10 numNodes=3 received=Val-4-1 test=Availability
+time="2023-03-11T18:41:20-08:00" level=warning msg="invalid value" expected=Val-4-2 group=jtrevill numKeys=10 numNodes=3 received=Val-4-1 test=Availability
+time="2023-03-11T18:41:20-08:00" level=warning msg="invalid value" expected=Val-5-2 group=jtrevill numKeys=10 numNodes=3 received=Val-5-1 test=Availability
+time="2023-03-11T18:41:20-08:00" level=warning msg="invalid value" expected=Val-5-2 group=jtrevill numKeys=10 numNodes=3 received=Val-5-1 test=Availability
+time="2023-03-11T18:41:20-08:00" level=warning msg="invalid value" expected=Val-6-2 group=jtrevill numKeys=10 numNodes=3 received=Val-6-1 test=Availability
+time="2023-03-11T18:41:20-08:00" level=warning msg="invalid value" expected=Val-7-2 group=jtrevill numKeys=10 numNodes=3 received=Val-7-1 test=Availability
+time="2023-03-11T18:41:20-08:00" level=warning msg="invalid value" expected=Val-7-2 group=jtrevill numKeys=10 numNodes=3 received=Val-7-1 test=Availability
+time="2023-03-11T18:41:20-08:00" level=warning msg="invalid value" expected=Val-8-2 group=jtrevill numKeys=10 numNodes=3 received=Val-8-1 test=Availability
+time="2023-03-11T18:41:20-08:00" level=warning msg="invalid value" expected=Val-8-2 group=jtrevill numKeys=10 numNodes=3 received=Val-8-1 test=Availability
+time="2023-03-11T18:41:40-08:00" level=info msg="final score: 0" group=jtrevill numKeys=10 numNodes=3 test=Availability
+time="2023-03-11T18:41:40-08:00" level=warning msg="test 5 did not finish with the full score." expected=10 got=0 group=jtrevill
+time="2023-03-11T18:41:40-08:00" level=info msg="Final score overall: 0.56" group=jtrevill
