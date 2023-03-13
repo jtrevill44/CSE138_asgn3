@@ -9,13 +9,12 @@ def make_shard_view(view: list, num_shards: int) -> dict:
     return_dict = dict()
     for i in range(num_shards):
         return_dict[i] = list()
-    current_list = 0
     iter_tracker = 0
     for address in view:
+        return_dict[iter_tracker].append(address)
         iter_tracker += 1
-        return_dict[current_list].append(address)
         if iter_tracker % length == 0:
-            current_list += 1
+            iter_tracker = 0
     return return_dict
     
 def find_shard(shard_view: dict) -> int:
