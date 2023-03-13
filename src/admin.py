@@ -46,7 +46,10 @@ def handle_views():
       return jsonify({'error' : 'uninitialized'}), 418
 
     if request.method == 'GET':
-        return jsonify(view=globals.current_view), 200
+        return_list = list()
+        for i in globals.shard_view.keys():
+            return_list.append({"shard_id" : str(i + 1), "nodes": globals.shard_view[i]})
+        return jsonify(view=return_list), 200
 
 
     elif request.method == 'DELETE':
