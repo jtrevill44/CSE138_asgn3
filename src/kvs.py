@@ -17,7 +17,7 @@ def kvs():
 
     #get the data from the request
     request_json = request.get_json()
-    causal_metadata = request_json.get('causal_metadata', None)
+    causal_metadata = request_json.get('causal-metadata', None)
     if causal_metadata != None:
         update_known_clocks(causal_metadata)
     else:
