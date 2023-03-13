@@ -36,3 +36,11 @@ async def broadcast(method, path, key, vector_clock, val=None, node_id = globals
     tasks.append(task)
   responses = await asyncio.gather(*tasks)
   return responses
+
+async def broadcast_shard(shard, method, path, key, vector_clock, val=None, node_id = globals.node_id, source = globals.address):
+  tasks = []
+  for node in shard:
+    task = asyncio.create_task(async_request(ip = node, path = path, method = method, key = key, vector_clock= vector_clock, val = val, node_id= node_id, source = source))
+    tasks.append(task)
+  responses = await asyncio.gather(*tasks)
+  return responses
