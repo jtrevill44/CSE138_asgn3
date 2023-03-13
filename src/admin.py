@@ -5,7 +5,6 @@ import math
 
 
 def make_shard_view(view: list, num_shards: int) -> dict:
-    length = math.ceil(len(view)/num_shards)
     return_dict = dict()
     for i in range(num_shards):
         return_dict[i] = list()
@@ -13,7 +12,7 @@ def make_shard_view(view: list, num_shards: int) -> dict:
     for address in view:
         return_dict[iter_tracker].append(address)
         iter_tracker += 1
-        if iter_tracker % length == 0:
+        if iter_tracker % num_shards == 0:
             iter_tracker = 0
     return return_dict
     
