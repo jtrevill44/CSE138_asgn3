@@ -39,7 +39,7 @@ def kvs():
             json = data.json()
             clocks = json.get('vector_clock')
             kvs_data = json.get('kvs')
-            last_writer = json.get('last_write')
+            last_writer = json.get('last-write')
             #compare all their data against ours, if theirs is ahead, update to it
             for key, value in kvs_data.items():
                 if compare(local_clocks, key, clocks.get(key, [0] * len(current_view))) == -1:
