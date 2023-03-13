@@ -17,7 +17,7 @@ def kvs():
 
     #get the data from the request
     request_json = request.get_json()
-    causal_metadata = request_json.get('causal_metadata', None)
+    causal_metadata = request_json.get('causal-metadata', None)
     if causal_metadata != None:
         update_known_clocks(causal_metadata)
     else:
@@ -39,7 +39,7 @@ def kvs():
             json = data.json()
             clocks = json.get('vector_clock')
             kvs_data = json.get('kvs')
-            last_writer = json.get('last-write')
+            last_writer = json.get('last_write')
             #compare all their data against ours, if theirs is ahead, update to it
             for key, value in kvs_data.items():
                 if compare(local_clocks, key, clocks.get(key, [0] * len(current_view))) == -1:
