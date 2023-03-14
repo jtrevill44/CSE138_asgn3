@@ -82,6 +82,14 @@ def handle_views():
             for key in globals.known_clocks.keys():
                 globals.known_clocks[key].extend([0] * (len(new_view) - len(globals.current_view)))
 
+        old_view_key_propogators = list()
+        if globals.shard_view: # there was a previous view
+            for shard in globals.shard_view.keys():
+                for address in globals.shard_view[shard]:
+                    if address in new_view:
+                        old_view_key_propogators.append(address)
+                        break
+
 
         globals.current_view = new_view
         globals.node_id = globals.current_view.index(globals.address) # get our new ID
@@ -120,3 +128,7 @@ def handle_update(): # function and end point for updating nodes with a view upd
 
     # globals.syncThread.start()
     return "", 200
+
+
+@admin.route('/shard', methods = ['PUT'])
+def send_shards():
