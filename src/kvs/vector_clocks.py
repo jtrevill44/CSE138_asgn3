@@ -30,6 +30,12 @@ def combine(self: dict, key: str, other_clock: list) -> None:
               return
         if not other_clock:
               return
+        
+         if len(self[key]) > len(other_clock):
+              other_clock.extend([0] * (len(self[key]) - len(other_clock)))
+        elif len(self[key]) < len(other_clock):
+              self[key].extend([0] * (len(other_clock) - len(self[key])))
+
         for index in range(len(self[key])):
             self[key][index] = max(self[key][index], other_clock[index])
         return
@@ -81,9 +87,10 @@ def compare(self: dict, key: str, other_clock: list)  -> int:
         elif not clock_check: # our clock is empty
               return LESS_THAN
 
-
-        if len(clock_check) != len(other_clock):
-              return None # idk man something fucking weird happened
+        if len(clock_check) > len(other_clock):
+              other_clock.extend([0] * (len(clock_check) - len(other_clock)))
+        elif len(clock_check) < len(other_clock):
+              clock_check.extend([0] * (len(other_clock) - len(clock_check)))
 
 
         for i in range(len(clock_check)):
