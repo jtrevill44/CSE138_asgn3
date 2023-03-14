@@ -31,7 +31,7 @@ def combine(self: dict, key: str, other_clock: list) -> None:
         if not other_clock:
               return
         
-         if len(self[key]) > len(other_clock):
+        if len(self[key]) > len(other_clock):
               other_clock.extend([0] * (len(self[key]) - len(other_clock)))
         elif len(self[key]) < len(other_clock):
               self[key].extend([0] * (len(other_clock) - len(self[key])))
