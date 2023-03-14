@@ -1,7 +1,8 @@
 from flask import Flask, request, jsonify, Blueprint
 import requests
+from broadcast import broadcast_shard
 import globals
-import math
+import hashlib
 
 
 def make_shard_view(view: list, num_shards: int) -> dict:
@@ -56,6 +57,8 @@ def handle_views():
         globals.known_clocks.clear()
         globals.last_write.clear()
         globals.node_id = -1
+        globals.shard_member = -1
+        globals.shard_view.clear()
         return "", 200
 
 
@@ -76,12 +79,6 @@ def handle_views():
                 continue
         # Nodes that were to be deleted are now deleted!
 
-        if len(globals.current_view) < len(new_view):
-            for key in globals.local_clocks.keys():
-                globals.local_clocks[key].extend([0] * (len(new_view) - len(globals.current_view)))
-            for key in globals.known_clocks.keys():
-                globals.known_clocks[key].extend([0] * (len(new_view) - len(globals.current_view)))
-
         old_view_key_propogators = list()
         if globals.shard_view: # there was a previous view
             for shard in globals.shard_view.keys():
@@ -89,6 +86,28 @@ def handle_views():
                     if address in new_view:
                         old_view_key_propogators.append(address)
                         break
+
+
+        if old_view_key_propogators: # we're gonna have to shift keys around!
+            for node in new_view:
+                if node == globals.address or node in old_view_key_propogators:
+                    continue
+                url = f"http://{node}/kvs/admin/view" # we're deleteing all nodes!
+                try:
+                    requests.delete(url, timeout=1)
+                except: # could be a partition or something, its fine!
+                    continue
+
+            for node in old_view_key_propogators:
+                url = f"http://{node}/kvs/admin/shard"
+                state = {"view" : new_view, "num_shards" : num_shards}
+                try:
+                    requests.put(url, json=state, timeout=1)
+                except:
+                    continue
+            
+            
+
 
 
         globals.current_view = new_view
@@ -101,7 +120,7 @@ def handle_views():
             if node == globals.address:
                 continue
             url = f"http://{node}/kvs/admin/update"
-            state = {"view":new_view, "kvs":globals.local_data, "vector_clock":globals.local_clocks, "known_clock" : globals.known_clocks, "num_shards": num_shards}
+            state = {"view":new_view, "num_shards": num_shards}
             try:
                 requests.put(url, json=state, timeout=1)
             except: 
@@ -118,9 +137,6 @@ def handle_views():
 def handle_update(): # function and end point for updating nodes with a view update
     body = request.get_json()
     globals.current_view = body.get('view')
-    globals.local_data = body.get('kvs')
-    globals.local_clocks = body.get('vector_clock')
-    globals.known_clocks = body.get('known_clock')
     globals.node_id = find_index()
     num_shards = body.get('num_shards')
     globals.shard_view = make_shard_view(globals.current_view, num_shards)
@@ -132,3 +148,41 @@ def handle_update(): # function and end point for updating nodes with a view upd
 
 @admin.route('/shard', methods = ['PUT'])
 def send_shards():
+    body = request.get_json()
+    new_view = body.get('view')
+    num_shards = body.get('num_shards')
+    shard_map = make_shard_view(new_view, num_shards)
+    shard_id = find_shard(shard_map)
+
+    if len(new_view) > len(globals.current_view): # extend clocks if needed!
+        for key in globals.local_clocks.keys():
+            globals.local_clocks[key].extend([0] * (len(new_view) - len(globals.current_view)))
+        for key in globals.known_clocks.keys():
+            globals.known_clocks[key].extend([0] * (len(new_view) - len(globals.current_view)))
+
+
+    for key, val in globals.local_data.items():
+        x = int(hashlib.sha256(key.encode()).hexdigest(), 16) % num_shards
+        broadcast_shard(shard_map[x], 'PUT', f'/kvs/admin/recieve', key, globals.local_clocks[key], val, source=globals.address)
+        if x != shard_id:
+            del globals.local_data[key]
+            del globals.local_clocks[key]
+            del globals.known_clocks[key]
+    return "", 200
+
+
+
+
+@admin.route('/recieve', methods = ['PUT'])
+def recieve_keys():
+    body = request.get_json()
+    key = body.get('key')
+    val = body.get('val')
+    source = body.get('source')
+    vector_clock = body.get('vector_clock')
+    if source == globals.address:
+        return # don't recieve stuff from ourself
+    globals.local_data[key] = val
+    globals.known_clocks[key] = vector_clock
+    globals.local_clocks[key] = vector_clock
+    return "", 200
