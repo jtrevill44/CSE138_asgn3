@@ -64,4 +64,5 @@ def kvs():
             break
         
     #return keys of all data
-    return jsonify({"count" : len(local_clocks), "keys" : list(local_data.keys()), "causal-metadata" : known_clocks}), 200
+    rtn = [x for x,y in local_data.items() if y is not None]
+    return jsonify({"count" : len(rtn), "keys" : rtn, "causal-metadata" : known_clocks}), 200
