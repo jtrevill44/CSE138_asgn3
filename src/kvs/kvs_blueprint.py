@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Blueprint
 from admin import admin
 from internal import internal
 from data_key import client_side
@@ -19,7 +19,7 @@ def is_valid_ipv4_address(ip):
 
 
 
-app = Flask(__name__)
+kvs_app = Blueprint("kvs_app",__name__, url_prefix="/internal_shard" )
 scheduler = APScheduler()
 track_var = 0
 
@@ -33,16 +33,13 @@ except:
   track_var = 1
 
 
-app.register_blueprint(admin, url_prefix="/kvs/admin")
-app.register_blueprint(internal, url_prefix="/kvs/internal")
-app.register_blueprint(client_side, url_prefix="/kvs/data")
-app.register_blueprint(get_all)
+kvs_app.register_blueprint(admin, url_prefix="/kvs/admin")
+kvs_app.register_blueprint(internal, url_prefix="/kvs/internal")
+kvs_app.register_blueprint(client_side, url_prefix="/kvs/data")
+kvs_app.register_blueprint(get_all)
+scheduler.add_job(id = 'Scheduled Task', func=sync_2, trigger="interval", seconds=3)
 
 if __name__ == "__main__":
     if track_var == 1:
       exit(1)
-    scheduler.add_job(id = 'Scheduled Task', func=sync_2, trigger="interval", seconds=3)
     scheduler.start()
-    app.run(host='0.0.0.0', port=8080)
-
-

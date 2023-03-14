@@ -20,7 +20,7 @@ def sync():
 
 def sync_2():
     try:
-        asyncio.run(broadcast('PUT', '/kvs/internal/sync', globals.local_data, globals.local_clocks, node_id=globals.last_write))
+        asyncio.run(broadcast('PUT', '/internal_shard/kvs/internal/sync', globals.local_data, globals.local_clocks, node_id=globals.last_write))
     except:
         pass
     
