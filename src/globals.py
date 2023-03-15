@@ -1,6 +1,7 @@
 import threading
 
 local_data = dict()
+temp_data = dict()
 current_view = list()
 local_clocks = dict()
 known_clocks = dict()

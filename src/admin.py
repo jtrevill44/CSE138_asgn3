@@ -3,7 +3,7 @@ import requests
 from broadcast import broadcast_shard
 import globals
 import hashlib
-
+import asyncio
 
 def make_shard_view(view: list, num_shards: int) -> dict:
     return_dict = dict()
@@ -125,10 +125,12 @@ def handle_views():
                 requests.put(url, json=state, timeout=1)
             except: 
                 continue
+        globals.local_data = globals.temp_data.copy()
+        globals.temp_data.clear()
         # globals.syncThread.start()
     else: # unsupported method!
         return "", 405
-
+    print(globals.local_data)
     return "", 200
 
 
@@ -141,7 +143,10 @@ def handle_update(): # function and end point for updating nodes with a view upd
     num_shards = body.get('num_shards')
     globals.shard_view = make_shard_view(globals.current_view, num_shards)
     globals.shard_member = find_shard(globals.shard_view)
+    globals.local_data = globals.temp_data.copy()
+    globals.temp_data.clear()
 
+    print(globals.local_data)
     # globals.syncThread.start()
     return "", 200
 
@@ -163,9 +168,8 @@ def send_shards():
 
     for key, val in globals.local_data.items():
         x = int(hashlib.sha256(key.encode()).hexdigest(), 16) % num_shards
-        broadcast_shard(shard_map[x], 'PUT', f'/kvs/admin/recieve', key, globals.local_clocks[key], val, source=globals.address)
+        asyncio.run(broadcast_shard(shard_map[x], 'PUT', f'/kvs/admin/recieve', key, globals.local_clocks[key], val, source=globals.address))
         if x != shard_id:
-            del globals.local_data[key]
             del globals.local_clocks[key]
             del globals.known_clocks[key]
     return "", 200
@@ -180,9 +184,7 @@ def recieve_keys():
     val = body.get('val')
     source = body.get('source')
     vector_clock = body.get('vector_clock')
-    if source == globals.address:
-        return # don't recieve stuff from ourself
-    globals.local_data[key] = val
+    globals.temp_data[key] = val
     globals.known_clocks[key] = vector_clock
     globals.local_clocks[key] = vector_clock
     return "", 200

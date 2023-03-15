@@ -64,4 +64,4 @@ def kvs():
             break
         
     #return keys of all data
-    return jsonify({"shard_id" :globals.shard_member, "count" : len(local_clocks), "keys" : list(local_data.keys()), "causal-metadata" : known_clocks}), 200
+    return jsonify({"shard_id" : str(globals.shard_member + 1), "count" : len(globals.local_data.keys()), "keys" : list(globals.local_data.keys()), "causal-metadata" : known_clocks}), 200
