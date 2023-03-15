@@ -4,7 +4,7 @@ import requests
 import threading
 import os
 import asyncio
-from broadcast import broadcast
+from broadcast import broadcast_shard
 
 
 def send_request():
@@ -20,7 +20,7 @@ def sync():
 
 def sync_2():
     try:
-        asyncio.run(broadcast('PUT', '/kvs/internal/sync', globals.local_data, globals.local_clocks, node_id=globals.last_write))
+        asyncio.run(broadcast_shard(globals.shard_view[globals.shard_member],'PUT', '/kvs/internal/sync', globals.local_data, globals.local_clocks, node_id=globals.last_write))
     except:
         pass
     
