@@ -65,10 +65,10 @@ def handle_views():
     elif request.method == 'PUT': # here comes all the complexity :)
         body = request.get_json()
 
-        if 'view' not in body.keys() or len(body.keys()) > 1 or 'num_shards' not in body.keys():
+        if 'nodes' not in body.keys() or 'num_shards' not in body.keys():
             return jsonify({"error" : "bad request"}), 400
 
-        new_view = body.get('view') # this is the new view!
+        new_view = body.get('nodes') # this is the new view!
         num_shards = body.get('num_shards')
         deleted_nodes = [x for x in globals.current_view if x not in new_view] # nodes to delete
         for node in deleted_nodes:

@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from vector_clocks import *
 from globals import *
-from broadcast import broadcast
+from broadcast import broadcast_shard
 from vector_clocks import compare, combine
 import asyncio
 
@@ -29,7 +29,7 @@ def kvs():
     #loop til we're up to date with the request's clocks
     while(True):
         #get the info from all the other nodes
-        datas = asyncio.run(broadcast('GET', '/kvs/internal/kvs', '',[], source=globals.address))
+        datas = asyncio.run(broadcast_shard(globals.shard_view[globals.shard_member], 'GET', '/kvs/internal/kvs', '',[], source=globals.address))
         #loop through the responses 
         for data in datas:
             #if dead, skip
@@ -64,4 +64,4 @@ def kvs():
             break
         
     #return keys of all data
-    return jsonify({"count" : len(local_clocks), "keys" : list(local_data.keys()), "causal-metadata" : known_clocks}), 200
+    return jsonify({"shard_id" :globals.shard_member, "count" : len(local_clocks), "keys" : list(local_data.keys()), "causal-metadata" : known_clocks}), 200
