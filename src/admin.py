@@ -130,7 +130,6 @@ def handle_views():
         # globals.syncThread.start()
     else: # unsupported method!
         return "", 405
-    print(globals.local_data)
     return "", 200
 
 
