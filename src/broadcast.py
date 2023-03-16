@@ -1,4 +1,5 @@
 import globals
+from flask import request, Response
 import asyncio
 import requests
 from multiprocessing import Pool
@@ -46,8 +47,24 @@ async def broadcast_shard(shard, method, path, key, vector_clock, val=None, node
   return responses
 
 
+async def proxy_request(address, req, route):
+  try:
+    response = requests.request(
+      method = req.method,
+      url = f"http://{address}{route}",
+      data = req.data,
+      headers = req.headers,
+      timeout = 15
+          )
+    return Response(response.content, response.status_code, response.headers.items())
+  except:
+    return -1
 
-async broadcast_request(addresses, req):
+
+async def broadcast_request(addresses, req, route):
     tasks = []
     for address in addresses:
-        task = asyncio.create_task(request
+      task = asyncio.create_task(proxy_request(address=address, req=req, route=route))
+      tasks.append(task)
+    responses = await asyncio.gather(*tasks)
+    return responses
