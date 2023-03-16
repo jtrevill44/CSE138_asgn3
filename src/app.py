@@ -35,7 +35,7 @@ except:
 
 app.register_blueprint(admin, url_prefix="/kvs/admin")
 app.register_blueprint(internal, url_prefix="/kvs/internal")
-app.register_blueprint(client_side, url_prefix="/kvs/data")
+app.register_blueprint(client_side, url_prefix="/internal")
 app.register_blueprint(get_all)
 
 if __name__ == "__main__":

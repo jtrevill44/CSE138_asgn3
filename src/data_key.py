@@ -7,7 +7,7 @@ import asyncio
 from datetime import datetime
 
 
-client_side = Blueprint('client_side', __name__, url_prefix= '/kvs/data')
+client_side = Blueprint('client_side', __name__, url_prefix= '/internal')
 EIGHT_MEGABYTES = 8388608
 
 @client_side.route('/<key>', methods = ['PUT', 'DELETE'])
