@@ -52,13 +52,14 @@ def handle_views():
 
 
     elif request.method == 'DELETE':
+        globals.node_id = -1
         globals.current_view.clear()
         globals.local_data.clear()
         globals.known_clocks.clear()
         globals.last_write.clear()
-        globals.node_id = -1
         globals.shard_member = -1
         globals.shard_view.clear()
+        
         return "", 200
 
 
@@ -70,14 +71,6 @@ def handle_views():
 
         new_view = body.get('nodes') # this is the new view!
         num_shards = body.get('num_shards')
-        deleted_nodes = [x for x in globals.current_view if x not in new_view] # nodes to delete
-        for node in deleted_nodes:
-            url = f"http://{node}/kvs/admin/view"
-            try:
-                requests.delete(url, timeout=1)
-            except: # could be a partition or something, its fine!
-                continue
-        # Nodes that were to be deleted are now deleted!
 
         old_view_key_propogators = list()
         if globals.shard_view: # there was a previous view
@@ -87,10 +80,20 @@ def handle_views():
                         old_view_key_propogators.append(address)
                         break
 
+        if not old_view_key_propogators:
+            for node in new_view:
+                url = f"http://{node}/kvs/admin/update"
+                state = {"view":new_view, "num_shards": num_shards}
+                try:
+                    requests.put(url, json=state, timeout=1)
+                except: 
+                    continue
+            return "", 200
+
 
         if old_view_key_propogators: # we're gonna have to shift keys around!
-            for node in new_view:
-                if node == globals.address or node in old_view_key_propogators:
+            for node in globals.current_view:
+                if node in old_view_key_propogators:
                     continue
                 url = f"http://{node}/kvs/admin/view" # we're deleteing all nodes!
                 try:
@@ -100,33 +103,12 @@ def handle_views():
 
             for node in old_view_key_propogators:
                 url = f"http://{node}/kvs/admin/shard"
-                state = {"view" : new_view, "num_shards" : num_shards}
+                state = {"view" : new_view, "num_shards" : num_shards, "propagators" : len(old_view_key_propogators)}
                 try:
                     requests.put(url, json=state, timeout=1)
                 except:
                     continue
-            
-            
-
-
-
-        globals.current_view = new_view
-        globals.node_id = globals.current_view.index(globals.address) # get our new ID
-        globals.shard_view = make_shard_view(globals.current_view, num_shards)
-        globals.shard_member = find_shard(globals.shard_view)
-
-        
-        for node in new_view: # send the new view and state to all nodes!
-            if node == globals.address:
-                continue
-            url = f"http://{node}/kvs/admin/update"
-            state = {"view":new_view, "num_shards": num_shards}
-            try:
-                requests.put(url, json=state, timeout=1)
-            except: 
-                continue
-        globals.local_data = globals.temp_data.copy()
-        globals.temp_data.clear()
+ 
         # globals.syncThread.start()
     else: # unsupported method!
         return "", 405
@@ -137,15 +119,18 @@ def handle_views():
 @admin.route('/update', methods = ['PUT'])
 def handle_update(): # function and end point for updating nodes with a view update
     body = request.get_json()
-    globals.current_view = body.get('view')
-    globals.node_id = find_index()
-    num_shards = body.get('num_shards')
-    globals.shard_view = make_shard_view(globals.current_view, num_shards)
-    globals.shard_member = find_shard(globals.shard_view)
-    globals.local_data = globals.temp_data.copy()
-    globals.temp_data.clear()
-
-    print(globals.local_data)
+    globals.propagators = body.get("propagators")
+    if globals.propagators_done != (globals.propagators - 1):
+        globals.propagators_done += 1
+    else:
+        globals.propagators_done = 0
+        globals.current_view = body.get('view')
+        globals.node_id = find_index()
+        num_shards = body.get('num_shards')
+        globals.shard_view = make_shard_view(globals.current_view, num_shards)
+        globals.shard_member = find_shard(globals.shard_view)
+        globals.local_data = globals.temp_data.copy()
+        globals.temp_data.clear()
     # globals.syncThread.start()
     return "", 200
 
@@ -155,6 +140,7 @@ def send_shards():
     body = request.get_json()
     new_view = body.get('view')
     num_shards = body.get('num_shards')
+    total_propagators = body.get("propagators")
     shard_map = make_shard_view(new_view, num_shards)
     shard_id = find_shard(shard_map)
 
@@ -171,6 +157,16 @@ def send_shards():
         if x != shard_id:
             del globals.local_clocks[key]
             del globals.known_clocks[key]
+
+    for node in new_view:
+        url = f"http://{node}/kvs/admin/update"
+        state = {"view":new_view, "num_shards": num_shards, "propagators" : total_propagators}
+        try:
+            requests.put(url, json=state, timeout=1)
+        except: 
+            continue
+
+
     return "", 200
 
 
