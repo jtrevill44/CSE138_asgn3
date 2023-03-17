@@ -113,6 +113,8 @@ def compare(self: dict, key: str, other_clock: list)  -> int:
             return EQUAL_TO
 
 def update_known_clocks(causal_metadata: dict):
+    if causal_metadata is None:
+          return
     for key, clock in causal_metadata.items():
         if key not in globals.known_clocks:
             globals.known_clocks[key] = clock
