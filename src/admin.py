@@ -52,11 +52,11 @@ def handle_views():
 
 
     elif request.method == 'DELETE':
+        globals.node_id = -1
         globals.current_view.clear()
         globals.local_data.clear()
         globals.known_clocks.clear()
         globals.last_write.clear()
-        globals.node_id = -1
         globals.shard_member = -1
         globals.shard_view.clear()
         return "", 200
