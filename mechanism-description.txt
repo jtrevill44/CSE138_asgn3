@@ -9,3 +9,9 @@ we don't need to think about causal consistency breaking due to nodes going down
 we used a form of quorum replication, since the client will let us know if we're behind and need more information. In summary, 
 we track causal consistency using vector clocks for each key, and we did not implement a system for checking if nodes go down, since we do not 
 really care if a node goes down.
+
+
+For sharding, we chose to just use hashing while this increases our network traffic when compared to consistent hashing
+it was a tradeoff we were willing to take in order to bring down complexity. We simply walk the list of the view, and
+distribute the node into each shard. Then we can hash the keys and broadcast requests to that shard. We also simply proxy requests 
+for requests that are on keys not within out shard. We just learn clocks that we see and then send the request. 
