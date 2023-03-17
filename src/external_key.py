@@ -10,7 +10,7 @@ external_key = Blueprint('external_key', __name__, url_prefix='/kvs/data')
 @external_key.route('/<key>', methods = ['GET', 'PUT', 'DELETE'])
 def external_route(key):
 
-    if (globals.node_id == -1):
+    if (len(globals.shard_view) == 0):
       return jsonify({"causal-metadata" : globals.local_clocks, 'error' : 'uninitialized'}), 418
 
     n = int(hashlib.sha256(key.encode()).hexdigest(),16) % len(globals.shard_view)
