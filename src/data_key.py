@@ -108,7 +108,7 @@ def get(key):
             return jsonify({"causal-metadata" : globals.known_clocks}), 404
         elif compare(globals.local_clocks, key, globals.known_clocks.get(key)) == 2:
             if globals.local_data.get(key, None) is None:
-              return {"causal-metadata": globals.known_clocks}, 404
+              return jsonify({"causal-metadata": globals.known_clocks}), 404
             return jsonify({"val" : globals.local_data[key], "causal-metadata" : globals.known_clocks})
         
     #compare internal clock to response clock
@@ -163,5 +163,5 @@ def get(key):
 
     #and return the data
     if globals.local_data.get(key, None) is None:
-      return {"causal-metadata": globals.known_clocks}, 404
+      return jsonify({"causal-metadata": globals.known_clocks}), 404
     return jsonify({"val" : globals.local_data[key], "causal-metadata" : globals.known_clocks})
