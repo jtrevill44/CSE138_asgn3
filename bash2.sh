@@ -7,3 +7,4 @@ curl -X PUT -d '{"val": "FUA", "causal-metadata": {"x": [1,0]}}' -H 'Content-Typ
 curl -X GET -d '{}' -H 'Content-Type: application/json' http://localhost:8081/kvs/data/y -w '%{http_code}\n'
 
 curl -X GET -d '{"causal-metadata":{"x":[1,0],"y":[0,1]}}' -H 'Content-Type: application/json' http://localhost:8081/kvs/data/x -w '%{http_code}\n'
+
