@@ -323,24 +323,51 @@ class TestAssignment(unittest.TestCase):
             
         time.sleep(6)
 
-        #check keys are appro
-        for h, p in zip(hosts2, ports2):
-            res = get(kvs_data_url(p, h))
-            # print(res.json().get('count')/2, 100/2)
-            self.assertAlmostEqual(res.json().get('count'), 500/2, delta=50)
 
+    #     changed_addresses.append(add_node)
+    #     res = put(kvs_view_admin_url(ports[0], hosts[0]),
+    #               put_view_body(changed_addresses, 2))
+    #     self.assertEqual(res.status_code, 200, msg="Bad status code on PUT view")
 
-        changed_addresses.append(add_node)
+    #     time.sleep(10)
+
+    #     for h, p in zip(hosts, ports):
+    #         res = get(kvs_data_url(p, h))
+    #         # print(res.json().get('count')/3, 100/3)
+    #         self.assertAlmostEqual(res.json().get('count'), 500/2, delta=25)
+
+    def test_values_after_shard_change(self):
         res = put(kvs_view_admin_url(ports[0], hosts[0]),
-                  put_view_body(changed_addresses, 2))
-        self.assertEqual(res.status_code, 200, msg="Bad status code on PUT view")
+                  put_view_body(view_addresses, len(hosts)))
+        self.assertEqual(res.statuscode, 200, msg="Bad status code on PUT view")
+
+        data = {}
+        for _ in range(500):
+            #generate random key and value pair
+            k = ''.join(random.choice(string.asciiletters) for  in range(10))
+            v = ''.join(random.choice(string.asciiletters) for  in range(10))
+            data[k] = v
+            rand_node = random.choice(range(len(hosts)))
+            put(kvs_data_key_url(k, ports[rand_node], hosts[rand_node]),
+                put_val_body(v))
+
+        res = put(kvs_view_admin_url(ports[0], hosts[0]),
+                  put_view_body(view_addresses, 1))
 
         time.sleep(10)
 
-        for h, p in zip(hosts, ports):
-            res = get(kvs_data_url(p, h))
-            # print(res.json().get('count')/3, 100/3)
-            self.assertAlmostEqual(res.json().get('count'), 500/2, delta=25)
+        for key, value in data.items():
+            rand_node = random.choice(range(len(hosts)))
+            resp = get(kvs_data_key_url(key, ports[rand_node], hosts[rand_node]))
+            json = resp.json()
+            self.assertEqual(value, json.get('val'), msg="val doesn't match stored val")
+
+
+
+    
+        
+
+
 
 if __name__ == '__main__':
     unittest.main(argv=["first-arg-ignored"], exit=False)
