@@ -311,6 +311,7 @@ class TestAssignment(unittest.TestCase):
         hosts2 = hosts
         ports2 = ports
         hosts2.pop()
+        print(ports2)
         ports2.remove(int(8082))
 
         for _ in range(500):
@@ -324,28 +325,28 @@ class TestAssignment(unittest.TestCase):
         time.sleep(6)
 
 
-    #     changed_addresses.append(add_node)
-    #     res = put(kvs_view_admin_url(ports[0], hosts[0]),
-    #               put_view_body(changed_addresses, 2))
-    #     self.assertEqual(res.status_code, 200, msg="Bad status code on PUT view")
+        changed_addresses.append(add_node)
+        res = put(kvs_view_admin_url(ports[0], hosts[0]),
+                  put_view_body(changed_addresses, 2))
+        self.assertEqual(res.status_code, 200, msg="Bad status code on PUT view")
 
-    #     time.sleep(10)
+        time.sleep(10)
 
-    #     for h, p in zip(hosts, ports):
-    #         res = get(kvs_data_url(p, h))
-    #         # print(res.json().get('count')/3, 100/3)
-    #         self.assertAlmostEqual(res.json().get('count'), 500/2, delta=25)
+        for h, p in zip(hosts, ports):
+            res = get(kvs_data_url(p, h))
+            # print(res.json().get('count')/3, 100/3)
+            self.assertAlmostEqual(res.json().get('count'), 500/2, delta=25)
 
     def test_values_after_shard_change(self):
         res = put(kvs_view_admin_url(ports[0], hosts[0]),
                   put_view_body(view_addresses, len(hosts)))
-        self.assertEqual(res.statuscode, 200, msg="Bad status code on PUT view")
+        self.assertEqual(res.status_code, 200, msg="Bad status code on PUT view")
 
         data = {}
         for _ in range(500):
             #generate random key and value pair
-            k = ''.join(random.choice(string.asciiletters) for  in range(10))
-            v = ''.join(random.choice(string.asciiletters) for  in range(10))
+            k = ''.join(random.choice(string.ascii_letters) for _ in range(10))
+            v = ''.join(random.choice(string.ascii_letters) for _ in range(10))
             data[k] = v
             rand_node = random.choice(range(len(hosts)))
             put(kvs_data_key_url(k, ports[rand_node], hosts[rand_node]),
