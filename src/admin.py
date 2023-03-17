@@ -83,7 +83,7 @@ def handle_views():
         if not old_view_key_propogators:
             for node in new_view:
                 url = f"http://{node}/kvs/admin/update"
-                state = {"view":new_view, "num_shards": num_shards}
+                state = {"view":new_view, "num_shards": num_shards, "propagators" : 1}
                 try:
                     requests.put(url, json=state, timeout=1)
                 except: 
