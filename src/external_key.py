@@ -19,23 +19,22 @@ def external_route(key):
             causal_metadata = body.get('causal-metadata', None)
             update_known_clocks(causal_metadata)
 
-
     if request.method == "DELETE":
         for i in responses: 
             if i.status_code == 200:
-                return i
+                json = i.get_json()
+                json['causal-metadata'] = globals.local_clocks
+                return jsonify(json), 200
         for i in responses:
             if i != -1:
-                body = i.get_json()
-                causal_metadata = body.get('causal-metadata', None)
-                update_known_clocks(causal_metadata)
-                return i
+                json = i.get_json()
+                json['causal-metadata'] = globals.local_clocks
+                return jsonify(json), i.status_code
             
     for i in responses:
         if i != -1 and i.status_code != 500:
-            body = i.get_json()
-            causal_metadata = body.get('causal-metadata', None)
-            update_known_clocks(causal_metadata)
-            return i
+            json = i.get_json()
+            json['causal-metadata'] = globals.local_clocks
+            return jsonify(json), i.status_code
 
     return jsonify({"causal-metadata" : globals.known_clocks, "error" : "timed out while waiting for depended updates"}), 500
