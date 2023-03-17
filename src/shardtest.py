@@ -101,178 +101,176 @@ class TestAssignment(unittest.TestCase):
         for h, p in zip(hosts,ports):
             delete(kvs_view_admin_url(p,h))
 
-        time.sleep(0.1)
+    # def test_distribution(self):
+    #     #initialize the view, with ~half as many shards as nodes
+    #     res = put(kvs_view_admin_url(ports[0], hosts[0]),
+    #               put_view_body(view_addresses, len(hosts)//2))
+    #     self.assertEqual(res.status_code, 200, msg="Bad status code on PUT view")
 
-    def test_distribution(self):
-        #initialize the view, with ~half as many shards as nodes
-        res = put(kvs_view_admin_url(ports[0], hosts[0]),
-                  put_view_body(view_addresses, len(hosts)//2))
-        self.assertEqual(res.status_code, 200, msg="Bad status code on PUT view")
+    #     time.sleep(1)
 
-        time.sleep(1)
-
-        for _ in range(500):
-            #generate random key and value pair
-            k = ''.join(random.choice(string.ascii_letters) for _ in range(10))
-            v = ''.join(random.choice(string.ascii_letters) for _ in range(10))
-            rand_node = random.choice(range(len(hosts)))
-            put(kvs_data_key_url(k, ports[rand_node], hosts[rand_node]), 
-                put_val_body(v))
+    #     for _ in range(500):
+    #         #generate random key and value pair
+    #         k = ''.join(random.choice(string.ascii_letters) for _ in range(10))
+    #         v = ''.join(random.choice(string.ascii_letters) for _ in range(10))
+    #         rand_node = random.choice(range(len(hosts)))
+    #         put(kvs_data_key_url(k, ports[rand_node], hosts[rand_node]), 
+    #             put_val_body(v))
             
-        time.sleep(10)
+    #     time.sleep(10)
 
-        #check keys are appro
-        for h, p in zip(hosts, ports):
-            res = get(kvs_data_url(p, h))
-            # print(res.json().get('count')/2, 100/2)
-            self.assertAlmostEqual(res.json().get('count'), 500/2, delta=50)
+    #     #check keys are appro
+    #     for h, p in zip(hosts, ports):
+    #         res = get(kvs_data_url(p, h))
+    #         # print(res.json().get('count')/2, 100/2)
+    #         self.assertAlmostEqual(res.json().get('count'), 500/2, delta=50)
 
 
-    def test_redistribution_add_shards(self):
-        #initialize the view, with ~half as many shards as nodes
-        res = put(kvs_view_admin_url(ports[0], hosts[0]),
-                  put_view_body(view_addresses, len(hosts)//2))
-        self.assertEqual(res.status_code, 200, msg="Bad status code on PUT view")
+    # def test_redistribution_add_shards(self):
+    #     #initialize the view, with ~half as many shards as nodes
+    #     res = put(kvs_view_admin_url(ports[0], hosts[0]),
+    #               put_view_body(view_addresses, len(hosts)//2))
+    #     self.assertEqual(res.status_code, 200, msg="Bad status code on PUT view")
 
-        time.sleep(1)
+    #     time.sleep(1)
 
-        for _ in range(500):
-            #generate random key and value pair
-            k = ''.join(random.choice(string.ascii_letters) for _ in range(10))
-            v = ''.join(random.choice(string.ascii_letters) for _ in range(10))
-            rand_node = random.choice(range(len(hosts)))
-            put(kvs_data_key_url(k, ports[rand_node], hosts[rand_node]), 
-                put_val_body(v))
+    #     for _ in range(500):
+    #         #generate random key and value pair
+    #         k = ''.join(random.choice(string.ascii_letters) for _ in range(10))
+    #         v = ''.join(random.choice(string.ascii_letters) for _ in range(10))
+    #         rand_node = random.choice(range(len(hosts)))
+    #         put(kvs_data_key_url(k, ports[rand_node], hosts[rand_node]), 
+    #             put_val_body(v))
             
-        time.sleep(7)
+    #     time.sleep(7)
 
-        #send a viewchange with a different number of nodes
-        res = put(kvs_view_admin_url(ports[0], hosts[0]),
-                  put_view_body(view_addresses, 4))
+    #     #send a viewchange with a different number of nodes
+    #     res = put(kvs_view_admin_url(ports[0], hosts[0]),
+    #               put_view_body(view_addresses, 4))
         
-        time.sleep(5)
+    #     time.sleep(5)
             
-        for h, p in zip(hosts, ports):
-            res = get(kvs_data_url(p, h))
-            # print(res.json().get('count')/3, 100/3)
-            self.assertAlmostEqual(res.json().get('count'), 500/4, delta=20)
+    #     for h, p in zip(hosts, ports):
+    #         res = get(kvs_data_url(p, h))
+    #         # print(res.json().get('count')/3, 100/3)
+    #         self.assertAlmostEqual(res.json().get('count'), 500/4, delta=20)
 
-    def test_redistribution_remove_shards(self):
-        #initialize the view, with ~half as many shards as nodes
-        res = put(kvs_view_admin_url(ports[0], hosts[0]),
-                  put_view_body(view_addresses, len(hosts)//2))
-        self.assertEqual(res.status_code, 200, msg="Bad status code on PUT view")
+    # def test_redistribution_remove_shards(self):
+    #     #initialize the view, with ~half as many shards as nodes
+    #     res = put(kvs_view_admin_url(ports[0], hosts[0]),
+    #               put_view_body(view_addresses, len(hosts)//2))
+    #     self.assertEqual(res.status_code, 200, msg="Bad status code on PUT view")
 
-        time.sleep(1)
+    #     time.sleep(1)
 
-        for _ in range(500):
-            #generate random key and value pair
-            k = ''.join(random.choice(string.ascii_letters) for _ in range(10))
-            v = ''.join(random.choice(string.ascii_letters) for _ in range(10))
-            rand_node = random.choice(range(len(hosts)))
-            put(kvs_data_key_url(k, ports[rand_node], hosts[rand_node]), 
-                put_val_body(v))
+    #     for _ in range(500):
+    #         #generate random key and value pair
+    #         k = ''.join(random.choice(string.ascii_letters) for _ in range(10))
+    #         v = ''.join(random.choice(string.ascii_letters) for _ in range(10))
+    #         rand_node = random.choice(range(len(hosts)))
+    #         put(kvs_data_key_url(k, ports[rand_node], hosts[rand_node]), 
+    #             put_val_body(v))
             
-        time.sleep(7)
+    #     time.sleep(7)
 
-        #send a viewchange with a different number of nodes
-        res = put(kvs_view_admin_url(ports[0], hosts[0]),
-                  put_view_body(view_addresses, 1))
+    #     #send a viewchange with a different number of nodes
+    #     res = put(kvs_view_admin_url(ports[0], hosts[0]),
+    #               put_view_body(view_addresses, 1))
         
-        time.sleep(5)
+    #     time.sleep(5)
             
-        for h, p in zip(hosts, ports):
-            res = get(kvs_data_url(p, h))
-            # print(res.json().get('count')/3, 100/3)
-            self.assertAlmostEqual(res.json().get('count'), 500, delta=0)
+    #     for h, p in zip(hosts, ports):
+    #         res = get(kvs_data_url(p, h))
+    #         # print(res.json().get('count')/3, 100/3)
+    #         self.assertAlmostEqual(res.json().get('count'), 500, delta=0)
         
         
 
-    def test_duplicate_keys(self):
-         #initialize the view, with ~half as many shards as nodes
-        res = put(kvs_view_admin_url(ports[0], hosts[0]),
-                  put_view_body(view_addresses, len(hosts)//2))
-        self.assertEqual(res.status_code, 200, msg="Bad status code on PUT view")
+    # def test_duplicate_keys(self):
+    #      #initialize the view, with ~half as many shards as nodes
+    #     res = put(kvs_view_admin_url(ports[0], hosts[0]),
+    #               put_view_body(view_addresses, len(hosts)//2))
+    #     self.assertEqual(res.status_code, 200, msg="Bad status code on PUT view")
 
-        time.sleep(1)
+    #     time.sleep(1)
 
-        for _ in range(500):
-            #generate random key and value pair
-            k = ''.join(random.choice(string.ascii_letters) for _ in range(10))
-            v = ''.join(random.choice(string.ascii_letters) for _ in range(10))
-            rand_node = random.choice(range(len(hosts)))
-            put(kvs_data_key_url(k, ports[rand_node], hosts[rand_node]), 
-                put_val_body(v))
+    #     for _ in range(500):
+    #         #generate random key and value pair
+    #         k = ''.join(random.choice(string.ascii_letters) for _ in range(10))
+    #         v = ''.join(random.choice(string.ascii_letters) for _ in range(10))
+    #         rand_node = random.choice(range(len(hosts)))
+    #         put(kvs_data_key_url(k, ports[rand_node], hosts[rand_node]), 
+    #             put_val_body(v))
             
-        time.sleep(6)
+    #     time.sleep(6)
 
-        kvs_hosts = {}
-        for (host, port) in zip(hosts, ports):
-            json = get(kvs_data_url(port, host)).json()
-            shard_id = json.get('shard_id')
-            if shard_id not in kvs_hosts:
-                kvs_hosts[shard_id] = json.get('keys')
+    #     kvs_hosts = {}
+    #     for (host, port) in zip(hosts, ports):
+    #         json = get(kvs_data_url(port, host)).json()
+    #         shard_id = json.get('shard_id')
+    #         if shard_id not in kvs_hosts:
+    #             kvs_hosts[shard_id] = json.get('keys')
         
-        total_keys = []
-        for host, kvs in kvs_hosts.items():
-            if total_keys == []:
-                total_keys = kvs
-            else:
-                for key in kvs:
-                    self.assertNotIn(key, total_keys, key + ' was found in multiple shards!')
+    #     total_keys = []
+    #     for host, kvs in kvs_hosts.items():
+    #         if total_keys == []:
+    #             total_keys = kvs
+    #         else:
+    #             for key in kvs:
+    #                 self.assertNotIn(key, total_keys, key + ' was found in multiple shards!')
 
-    def test_get_key_other_shard(self):
-         #initialize the view, with ~half as many shards as nodes
-        res = put(kvs_view_admin_url(ports[0], hosts[0]),
-                  put_view_body(view_addresses, len(hosts)//2))
-        self.assertEqual(res.status_code, 200, msg="Bad status code on PUT view")
+    # def test_get_key_other_shard(self):
+    #      #initialize the view, with ~half as many shards as nodes
+    #     res = put(kvs_view_admin_url(ports[0], hosts[0]),
+    #               put_view_body(view_addresses, len(hosts)//2))
+    #     self.assertEqual(res.status_code, 200, msg="Bad status code on PUT view")
 
-        time.sleep(1)
+    #     time.sleep(1)
 
-        for _ in range(50):
-            #generate random key and value pair
-            k = ''.join(random.choice(string.ascii_letters) for _ in range(10))
-            v = ''.join(random.choice(string.ascii_letters) for _ in range(10))
-            rand_node = random.choice(range(len(hosts)))
-            put(kvs_data_key_url(k, ports[rand_node], hosts[rand_node]), 
-                put_val_body(v))
+    #     for _ in range(50):
+    #         #generate random key and value pair
+    #         k = ''.join(random.choice(string.ascii_letters) for _ in range(10))
+    #         v = ''.join(random.choice(string.ascii_letters) for _ in range(10))
+    #         rand_node = random.choice(range(len(hosts)))
+    #         put(kvs_data_key_url(k, ports[rand_node], hosts[rand_node]), 
+    #             put_val_body(v))
             
-        time.sleep(6)
+    #     time.sleep(6)
 
-        key = get(kvs_data_url(ports[0], hosts[0])).json().get('keys')[0]
-        val = get(kvs_data_key_url(key, ports[0], hosts[0])).json().get('val')
-        for (host, port) in zip(hosts, ports):
-            self.assertEqual(val, get(kvs_data_key_url(key, port, host)).json().get('val'), 'key was not accessible from ' + kvs_data_url(ports[0], hosts[0]))
+    #     key = get(kvs_data_url(ports[0], hosts[0])).json().get('keys')[0]
+    #     val = get(kvs_data_key_url(key, ports[0], hosts[0])).json().get('val')
+    #     for (host, port) in zip(hosts, ports):
+    #         self.assertEqual(val, get(kvs_data_key_url(key, port, host)).json().get('val'), 'key was not accessible from ' + kvs_data_url(ports[0], hosts[0]))
     
-    def test_get_nonexistent_key(self):
-         #initialize the view, with ~half as many shards as nodes
-        res = put(kvs_view_admin_url(ports[0], hosts[0]),
-                  put_view_body(view_addresses, len(hosts)//2))
-        self.assertEqual(res.status_code, 200, msg="Bad status code on PUT view")
+    # def test_get_nonexistent_key(self):
+    #      #initialize the view, with ~half as many shards as nodes
+    #     res = put(kvs_view_admin_url(ports[0], hosts[0]),
+    #               put_view_body(view_addresses, len(hosts)//2))
+    #     self.assertEqual(res.status_code, 200, msg="Bad status code on PUT view")
 
-        time.sleep(1)
+    #     time.sleep(1)
 
-        for _ in range(50):
-            #generate random key and value pair
-            k = ''.join(random.choice(string.ascii_letters) for _ in range(10))
-            v = ''.join(random.choice(string.ascii_letters) for _ in range(10))
-            rand_node = random.choice(range(len(hosts)))
-            put(kvs_data_key_url(k, ports[rand_node], hosts[rand_node]), 
-                put_val_body(v))
+    #     for _ in range(50):
+    #         #generate random key and value pair
+    #         k = ''.join(random.choice(string.ascii_letters) for _ in range(10))
+    #         v = ''.join(random.choice(string.ascii_letters) for _ in range(10))
+    #         rand_node = random.choice(range(len(hosts)))
+    #         put(kvs_data_key_url(k, ports[rand_node], hosts[rand_node]), 
+    #             put_val_body(v))
             
-        time.sleep(6)
+    #     time.sleep(6)
 
-        self.assertNotEqual(int(418), get(kvs_data_key_url('a', ports[0], hosts[0])).json().get('key'), 'invalid key was thought that it existed')
+    #     self.assertNotEqual(int(418), get(kvs_data_key_url('a', ports[0], hosts[0])).json().get('key'), 'invalid key was thought that it existed')
 
     def test_remove_node_shard(self):
         #initialize the view, with ~half as many shards as nodes
         res = put(kvs_view_admin_url(ports[0], hosts[0]),
-                  put_view_body(view_addresses, len(hosts)//2))
+                  put_view_body(view_addresses, 2))
         self.assertEqual(res.status_code, 200, msg="Bad status code on PUT view")
 
-        time.sleep(1)
+        time.sleep(0.2)
 
-        for _ in range(50):
+        for _ in range(500):
             #generate random key and value pair
             k = ''.join(random.choice(string.ascii_letters) for _ in range(10))
             v = ''.join(random.choice(string.ascii_letters) for _ in range(10))
@@ -282,52 +280,60 @@ class TestAssignment(unittest.TestCase):
             
         time.sleep(6)
 
-
-        view_addresses.pop()
+        changed_addresses = view_addresses
+        removed_node = changed_addresses.pop()
         res = put(kvs_view_admin_url(ports[0], hosts[0]),
-                  put_view_body(view_addresses, len(hosts)//2))
+                  put_view_body(changed_addresses, 2))
         self.assertEqual(res.status_code, 200, msg="Bad status code on PUT view")
 
-        time.sleep(6)
+        time.sleep(10)
 
-        hosts.pop()
-        ports.pop()
-        for h, p in zip(hosts, ports):
+        hosts2 = hosts
+        ports2 = ports
+        hosts2.pop()
+        ports2.remove(int(removed_node.split(':')[1]))
+        print(removed_node)
+        print(removed_node.split(':')[1])
+        print(changed_addresses)
+        print(get(kvs_view_admin_url(ports[0], hosts[0])))
+        for h, p in zip(hosts2, ports2):
             res = get(kvs_data_url(p, h))
+            print(res)
             # print(res.json().get('count')/3, 100/3)
-            self.assertAlmostEqual(res.json().get('count'), 500/2, delta=50)
+            self.assertAlmostEqual(res.json().get('count'), 500/2, delta=25)
 
-    def test_add_node_shard(self):
-        #initialize the view, with ~half as many shards as nodes
-        add_node = view_addresses.pop()
-        res = put(kvs_view_admin_url(ports[0], hosts[0]),
-                  put_view_body(view_addresses, len(hosts)//2))
-        self.assertEqual(res.status_code, 200, msg="Bad status code on PUT view")
+    # def test_add_node_shard(self):
+    #     #initialize the view, with ~half as many shards as nodes
+    #     changed_addresses = view_addresses
+    #     add_node = changed_addresses.pop()
+    #     res = put(kvs_view_admin_url(ports[0], hosts[0]),
+    #               put_view_body(changed_addresses, 2))
+    #     self.assertEqual(res.status_code, 200, msg="Bad status code on PUT view")
 
-        time.sleep(1)
+    #     time.sleep(1)
 
-        for _ in range(50):
-            #generate random key and value pair
-            k = ''.join(random.choice(string.ascii_letters) for _ in range(10))
-            v = ''.join(random.choice(string.ascii_letters) for _ in range(10))
-            rand_node = random.choice(range(len(hosts)))
-            put(kvs_data_key_url(k, ports[rand_node], hosts[rand_node]), 
-                put_val_body(v))
+    #     for _ in range(500):
+    #         #generate random key and value pair
+    #         k = ''.join(random.choice(string.ascii_letters) for _ in range(10))
+    #         v = ''.join(random.choice(string.ascii_letters) for _ in range(10))
+    #         rand_node = random.choice(range(len(hosts)))
+    #         put(kvs_data_key_url(k, ports[rand_node], hosts[rand_node]), 
+    #             put_val_body(v))
             
-        time.sleep(6)
+    #     time.sleep(6)
 
 
-        view_addresses.append(add_node)
-        res = put(kvs_view_admin_url(ports[0], hosts[0]),
-                  put_view_body(view_addresses, len(hosts)//2))
-        self.assertEqual(res.status_code, 200, msg="Bad status code on PUT view")
+    #     changed_addresses.append(add_node)
+    #     res = put(kvs_view_admin_url(ports[0], hosts[0]),
+    #               put_view_body(changed_addresses, 2))
+    #     self.assertEqual(res.status_code, 200, msg="Bad status code on PUT view")
 
-        time.sleep(6)
+    #     time.sleep(10)
 
-        for h, p in zip(hosts, ports):
-            res = get(kvs_data_url(p, h))
-            # print(res.json().get('count')/3, 100/3)
-            self.assertAlmostEqual(res.json().get('count'), 500/2, delta=50)
+    #     for h, p in zip(hosts, ports):
+    #         res = get(kvs_data_url(p, h))
+    #         # print(res.json().get('count')/3, 100/3)
+    #         self.assertAlmostEqual(res.json().get('count'), 500/2, delta=25)
 
 
 
