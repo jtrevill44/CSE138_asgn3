@@ -1,5 +1,5 @@
 
-In this assignment, we decided to keep a vector clock for each key with in the kvs. 
+In this project, we decided to keep a vector clock for each key with in the kvs. 
 we did this, since we are comfortable with the structure and behaviors of vector clocks.
 we also keep a clock for each variable, in order to track conflicting requests vs non conflicting requests.
 We deemed it unnececary to make a system for tracking if a node goes down or not. We found that we didn't 

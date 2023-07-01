@@ -1,1 +1,8 @@
-# CSE138_asgn3
+# Distributed Key-Value Storer
+
+### Created in Python by:
+* Joshua Revilla
+* Ronan McClorey
+* Mahesh Vegiraju
+
+
